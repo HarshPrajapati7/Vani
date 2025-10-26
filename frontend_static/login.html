@@ -153,75 +153,143 @@ body::before{
       <p>Sign in to access your flood insurance dashboard</p>
     </div>
 
-    <div class="clerk-container" id="clerkSignIn">
-      <!-- Clerk sign-in form will load here -->
+    <div class="clerk-container" id="authContainer">
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="margin-bottom: 24px;">
+          <div style="width: 48px; height: 48px; margin: 0 auto 16px; border: 3px solid #10b981; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+          <style>
+            @keyframes spin {
+              to { transform: rotate(360deg); }
+            }
+          </style>
+        </div>
+        <h3 style="color: var(--dark-forest); margin-bottom: 8px; font-size: 18px;">Initializing Authentication...</h3>
+        <p style="color: var(--text-muted); font-size: 14px;">Please wait while we set up secure login</p>
+      </div>
     </div>
 
     <div id="errorContainer"></div>
   </div>
 </div>
 
-<script
-  async
-  crossorigin="anonymous"
-  data-clerk-publishable-key="pk_test_ZnJlZS1wYXJyb3QtMzkuY2xlcmsuYWNjb3VudHMuZGV2JA"
-  src="https://free-parrot-39.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
-  type="text/javascript"
-></script>
+<!-- Auth0 SDK -->
+<script src="https://cdn.auth0.com/js/auth0-spa-js/2.1/auth0-spa-js.production.js"></script>
 
 <script>
+// Auth0 Configuration - Replace these with your actual Auth0 credentials
+const AUTH0_CONFIG = {
+  domain: 'dev-YOUR_DOMAIN.us.auth0.com',  // Replace with your Auth0 domain
+  clientId: 'YOUR_CLIENT_ID',  // Replace with your Auth0 client ID
+  authorizationParams: {
+    redirect_uri: window.location.origin + '/dashboard.html'
+  }
+};
+
+let auth0Client = null;
+
 window.addEventListener('load', async () => {
   try {
-    // Initialize Clerk
-    const clerk = window.Clerk;
-    await clerk.load();
-
-    // Preserve optional api override parameter
-    const params = new URLSearchParams(window.location.search);
-    const apiParam = params.get('api');
+    const errorContainer = document.getElementById('errorContainer');
+    const authContainer = document.getElementById('authContainer');
     
-    // Use current domain (works for both local and Netlify)
-    const currentOrigin = window.location.origin;
-    const afterUrlBase = `${currentOrigin}/dashboard.html`;
-    const loginUrlBase = `${currentOrigin}/login.html`;
-    const afterSignInUrl = apiParam ? `${afterUrlBase}?api=${encodeURIComponent(apiParam)}` : afterUrlBase;
-    const signUpUrl = apiParam ? `${loginUrlBase}?api=${encodeURIComponent(apiParam)}` : loginUrlBase;
+    // Initialize Auth0
+    auth0Client = await auth0.createAuth0Client(AUTH0_CONFIG);
 
-    // Check if user is already signed in
-    if (clerk.user) {
-      // User is signed in, redirect to dashboard
-      window.location.href = afterSignInUrl;
+    // Check if user is already authenticated
+    const isAuthenticated = await auth0Client.isAuthenticated();
+    
+    if (isAuthenticated) {
+      // User is logged in, redirect to dashboard
+      window.location.replace('/dashboard.html');
       return;
     }
 
-    // Mount the sign-in component
-    const signInDiv = document.getElementById('clerkSignIn');
-    clerk.mountSignIn(signInDiv, {
-      appearance: {
-        elements: {
-          formButtonPrimary: {
-            backgroundColor: '#10b981',
-            '&:hover': {
-              backgroundColor: '#059669'
-            }
-          },
-          card: {
-            boxShadow: 'none'
-          }
-        }
-      },
-      afterSignInUrl,
-      signUpUrl
+    // Check if returning from Auth0 login
+    const query = window.location.search;
+    if (query.includes('code=') && query.includes('state=')) {
+      // Handle the redirect callback
+      authContainer.innerHTML = `
+        <div style="text-align: center; padding: 40px 20px;">
+          <div style="margin-bottom: 24px;">
+            <div style="width: 48px; height: 48px; margin: 0 auto 16px; border: 3px solid #10b981; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+          </div>
+          <h3 style="color: var(--dark-forest); margin-bottom: 8px; font-size: 18px;">Completing sign in...</h3>
+          <p style="color: var(--text-muted); font-size: 14px;">You'll be redirected shortly</p>
+        </div>
+      `;
+      
+      await auth0Client.handleRedirectCallback();
+      window.location.replace('/dashboard.html');
+      return;
+    }
+
+    // Show login button
+    authContainer.innerHTML = `
+      <button id="loginBtn" style="
+        width: 100%;
+        padding: 16px 24px;
+        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+        color: white;
+        border: none;
+        border-radius: 12px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        font-family: var(--font-body);
+      ">
+        Sign In with Auth0
+      </button>
+      <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
+        Secure authentication powered by Auth0
+      </p>
+    `;
+
+    // Add hover effect
+    const loginBtn = document.getElementById('loginBtn');
+    loginBtn.addEventListener('mouseenter', () => {
+      loginBtn.style.transform = 'translateY(-2px)';
+      loginBtn.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
+    });
+    loginBtn.addEventListener('mouseleave', () => {
+      loginBtn.style.transform = 'translateY(0)';
+      loginBtn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
+    });
+
+    // Handle login
+    loginBtn.addEventListener('click', async () => {
+      try {
+        loginBtn.disabled = true;
+        loginBtn.innerHTML = `
+          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <div style="width: 20px; height: 20px; border: 2px solid white; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite;"></div>
+            <span>Signing in...</span>
+          </div>
+        `;
+        await auth0Client.loginWithRedirect();
+      } catch (error) {
+        console.error('Login error:', error);
+        loginBtn.disabled = false;
+        loginBtn.innerHTML = 'Sign In with Auth0';
+        errorContainer.innerHTML = `
+          <div class="error-message" style="display:flex; align-items:center; gap:8px; justify-content:center;">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+            <strong>Sign In Failed</strong><br>
+            ${error.message || 'Please try again or contact support.'}
+          </div>
+        `;
+      }
     });
 
   } catch (error) {
-    console.error('Clerk initialization error:', error);
+    console.error('Auth0 initialization error:', error);
     const errorContainer = document.getElementById('errorContainer');
     errorContainer.innerHTML = `
       <div class="error-message" style="display:flex; align-items:center; gap:8px; justify-content:center;">
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-        <strong>Authentication Error</strong><br>
-        Unable to load authentication. Please check your Clerk configuration.
+        <strong>Authentication Setup Error</strong><br>
+        Please configure Auth0 credentials in the code.
       </div>
     `;
   }
