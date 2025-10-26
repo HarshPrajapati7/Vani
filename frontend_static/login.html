@@ -164,8 +164,8 @@ body::before{
 <script
   async
   crossorigin="anonymous"
-  data-clerk-publishable-key="pk_test_bWVycnktbW9sbHVzay03NS5jbGVyay5hY2NvdW50cy5kZXYk"
-  src="https://merry-mollusk-75.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  data-clerk-publishable-key="pk_test_ZnJlZS1wYXJyb3QtMzkuY2xlcmsuYWNjb3VudHMuZGV2JA"
+  src="https://free-parrot-39.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
   type="text/javascript"
 ></script>
 
@@ -179,8 +179,11 @@ window.addEventListener('load', async () => {
     // Preserve optional api override parameter
     const params = new URLSearchParams(window.location.search);
     const apiParam = params.get('api');
-    const afterUrlBase = 'http://127.0.0.1:8080/frontend_static/dashboard.html';
-    const loginUrlBase = 'http://127.0.0.1:8080/frontend_static/login.html';
+    
+    // Use current domain (works for both local and Netlify)
+    const currentOrigin = window.location.origin;
+    const afterUrlBase = `${currentOrigin}/dashboard.html`;
+    const loginUrlBase = `${currentOrigin}/login.html`;
     const afterSignInUrl = apiParam ? `${afterUrlBase}?api=${encodeURIComponent(apiParam)}` : afterUrlBase;
     const signUpUrl = apiParam ? `${loginUrlBase}?api=${encodeURIComponent(apiParam)}` : loginUrlBase;
 
