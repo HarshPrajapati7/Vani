@@ -223,64 +223,30 @@ window.addEventListener('load', async () => {
       return;
     }
 
-    // Show login button
+    // Automatically redirect to Auth0 login
     authContainer.innerHTML = `
-      <button id="loginBtn" style="
-        width: 100%;
-        padding: 16px 24px;
-        background: linear-gradient(135deg, #10b981 0%, #059669 100%);
-        color: white;
-        border: none;
-        border-radius: 12px;
-        font-size: 16px;
-        font-weight: 600;
-        cursor: pointer;
-        transition: all 0.3s ease;
-        box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
-        font-family: var(--font-body);
-      ">
-        Sign In with Auth0
-      </button>
-      <p style="text-align: center; margin-top: 16px; font-size: 13px; color: var(--text-muted);">
-        Secure authentication powered by Auth0
-      </p>
+      <div style="text-align: center; padding: 40px 20px;">
+        <div style="margin-bottom: 24px;">
+          <div style="width: 48px; height: 48px; margin: 0 auto 16px; border: 3px solid #10b981; border-radius: 50%; border-top-color: transparent; animation: spin 1s linear infinite;"></div>
+        </div>
+        <h3 style="color: var(--dark-forest); margin-bottom: 8px; font-size: 18px;">Redirecting to Sign In...</h3>
+        <p style="color: var(--text-muted); font-size: 14px;">Please wait a moment</p>
+      </div>
     `;
 
-    // Add hover effect
-    const loginBtn = document.getElementById('loginBtn');
-    loginBtn.addEventListener('mouseenter', () => {
-      loginBtn.style.transform = 'translateY(-2px)';
-      loginBtn.style.boxShadow = '0 6px 16px rgba(16, 185, 129, 0.4)';
-    });
-    loginBtn.addEventListener('mouseleave', () => {
-      loginBtn.style.transform = 'translateY(0)';
-      loginBtn.style.boxShadow = '0 4px 12px rgba(16, 185, 129, 0.3)';
-    });
-
-    // Handle login
-    loginBtn.addEventListener('click', async () => {
-      try {
-        loginBtn.disabled = true;
-        loginBtn.innerHTML = `
-          <div style="display: flex; align-items: center; justify-content: center; gap: 8px;">
-            <div style="width: 20px; height: 20px; border: 2px solid white; border-radius: 50%; border-top-color: transparent; animation: spin 0.8s linear infinite;"></div>
-            <span>Signing in...</span>
-          </div>
-        `;
-        await auth0Client.loginWithRedirect();
-      } catch (error) {
-        console.error('Login error:', error);
-        loginBtn.disabled = false;
-        loginBtn.innerHTML = 'Sign In with Auth0';
-        errorContainer.innerHTML = `
-          <div class="error-message" style="display:flex; align-items:center; gap:8px; justify-content:center;">
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-            <strong>Sign In Failed</strong><br>
-            ${error.message || 'Please try again or contact support.'}
-          </div>
-        `;
-      }
-    });
+    // Automatically trigger Auth0 login
+    try {
+      await auth0Client.loginWithRedirect();
+    } catch (error) {
+      console.error('Login redirect error:', error);
+      errorContainer.innerHTML = `
+        <div class="error-message" style="display:flex; align-items:center; gap:8px; justify-content:center;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <strong>Sign In Failed</strong><br>
+          ${error.message || 'Please try again or contact support.'}
+        </div>
+      `;
+    }
 
   } catch (error) {
     console.error('Auth0 initialization error:', error);
