@@ -9,6 +9,14 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
 
+    <!-- Animation Libraries -->
+    <script src="https://unpkg.com/@barba/core@2.9.7/dist/barba.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    
+    <!-- Textbits for stunning text animations -->
+    <script src="https://unpkg.com/textbits@1.0.3/dist/textbits.min.js"></script>
+
     <style>
         :root{
             --dark-forest:#0a3d2c; --deep-green:#0f5538; --emerald:#10b981;
@@ -53,7 +61,7 @@
                 }
 
         /* Hero */
-                .hero{ padding:80px 0 56px; text-align:center; }
+                .hero{ padding:80px 0 56px; text-align:center; position:relative; z-index:5; }
                 .hero h1{ 
                     font-family: 'Poppins', sans-serif;
                     font-weight: 800;
@@ -64,6 +72,7 @@
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
+                    position:relative; z-index:5;
                 }
                 .hero p{ 
                     color:var(--text-muted); font-size:18px; line-height:1.55; 
@@ -72,6 +81,7 @@
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
                     background-clip: text;
+                    position:relative; z-index:5;
                 }
                 @media (max-width: 720px){
                     .hero{ padding:48px 0 40px }
@@ -83,8 +93,8 @@
                     .hero p{ font-size:15px }
                 }
 
-        .cta{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
-        .btn{ display:inline-flex; align-items:center; gap:10px; padding:13px 20px; border-radius:12px; font-weight:700; text-decoration:none; transition:transform .15s ease, box-shadow .2s ease; font-size:15px; }
+        .cta{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; position:relative; z-index:10; }
+        .btn{ display:inline-flex; align-items:center; gap:10px; padding:13px 20px; border-radius:12px; font-weight:700; text-decoration:none; transition:transform .15s ease, box-shadow .2s ease; font-size:15px; position:relative; z-index:10; }
         .btn-primary{ color:#062a1f; background:linear-gradient(135deg, #34d399, #10b981); box-shadow:0 10px 30px rgba(16,185,129,.35); }
         .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 16px 40px rgba(16,185,129,.45); }
         .btn-ghost{ color:#eafaf4; border:1px solid rgba(255,255,255,.16); }
@@ -93,37 +103,167 @@
             .btn{ padding:11px 18px; font-size:14px }
         }
 
-        /* Mock dashboard area */
-                .hero-visual{ margin:48px auto 0; width:min(calc(var(--container-max) / var(--phi)), 94vw); aspect-ratio: 16/9; position:relative; }
+        /* Mock dashboard area with enhanced multi-layer smoky gradients */
+                .hero-visual{ margin:48px auto 0; width:min(calc(var(--container-max) / var(--phi)), 94vw); aspect-ratio: 16/9; position:relative; overflow: visible; }
                 .hero-visual::before{ content:''; position:absolute; inset:-28px -32px 24px; border-radius:24px; background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); filter:blur(0.3px); border:1px solid rgba(255,255,255,0.06); z-index:1; }
-                    /* Copilot-like neon glow around the mockup (purple/blue/cyan) */
-                    .neon-ring{ position:absolute; inset:-6%; border-radius:28px; z-index:0; pointer-events:none;
-                        background: conic-gradient(from 0deg, rgba(99,102,241,.40), rgba(34,211,238,.50), rgba(56,189,248,.40), rgba(167,139,250,.45), rgba(99,102,241,.40));
-                        filter: blur(28px) saturate(150%);
-                        animation: hueSweep 20s linear infinite;
-                        opacity:.9;
-                    }
-                    /* Bright animated band hugging the top edge of the frame */
-                    .neon-edge{ position:absolute; left:3.5%; right:3.5%; top:-16px; height:30px; z-index:0; pointer-events:none;
-                        background: linear-gradient(90deg, #22d3ee 0%, #60a5fa 33%, #a78bfa 66%, #22d3ee 100%);
-                        background-size: 220% 100%; filter: blur(16px) saturate(160%); opacity:.98;
-                        animation: edgeRun 7s ease-in-out infinite;
-                    }
-                    /* Soft horizontal halo rising from the frame */
-                    .neon-halo{ position:absolute; left:-6%; right:-6%; bottom:52%; height:220px; z-index:0; pointer-events:none;
-                        background: radial-gradient(120% 160% at 50% 100%, rgba(56,189,248,.55) 0%, rgba(167,139,250,.50) 35%, rgba(34,211,238,.35) 55%, rgba(0,0,0,0) 72%);
-                        filter: blur(36px) saturate(140%); opacity:.9;
-                        animation: floatUp 10s ease-in-out infinite alternate;
-                    }
-                    @keyframes hueSweep { to { filter: blur(28px) saturate(150%) hue-rotate(360deg); } }
-                    @keyframes floatUp { 0%{ transform:translateY(0)} 100%{ transform:translateY(-8px)} }
-                @keyframes edgeRun { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+                
+                /* Glow layer 1 - Large rotating gradient */
+                .neon-ring{ position:absolute; inset:-4%; border-radius:28px; z-index:-1; pointer-events:none;
+                    background: conic-gradient(from 0deg at 50% 50%, 
+                        rgba(99,102,241,0.6) 0deg,
+                        rgba(34,211,238,0.7) 90deg,
+                        rgba(56,189,248,0.6) 180deg,
+                        rgba(167,139,250,0.65) 270deg,
+                        rgba(99,102,241,0.6) 360deg
+                    );
+                    filter: blur(35px) saturate(160%);
+                    animation: smoothRotate 25s linear infinite;
+                    opacity: 0.85;
+                }
+                
+                /* Glow layer 2 - Counter-rotating overlay */
+                .neon-ring::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 28px;
+                    background: conic-gradient(from 180deg at 50% 50%, 
+                        rgba(34,211,238,0.5) 0deg,
+                        rgba(167,139,250,0.6) 90deg,
+                        rgba(99,102,241,0.5) 180deg,
+                        rgba(56,189,248,0.55) 270deg,
+                        rgba(34,211,238,0.5) 360deg
+                    );
+                    animation: smoothRotateReverse 20s linear infinite;
+                }
+                
+                /* Glow layer 3 - Third rotating layer for more depth */
+                .neon-ring::after {
+                    content: '';
+                    position: absolute;
+                    inset: -2%;
+                    border-radius: 28px;
+                    background: conic-gradient(from 90deg at 50% 50%, 
+                        rgba(236,72,153,0.4) 0deg,
+                        rgba(34,211,238,0.5) 90deg,
+                        rgba(99,102,241,0.4) 180deg,
+                        rgba(56,189,248,0.45) 270deg,
+                        rgba(236,72,153,0.4) 360deg
+                    );
+                    filter: blur(30px) saturate(150%);
+                    animation: smoothRotate 30s linear infinite reverse;
+                }
+                
+                /* Bright animated band at top - flowing gradient */
+                .neon-edge{ position:absolute; left:5%; right:5%; top:-12px; height:35px; z-index:-1; pointer-events:none;
+                    background: linear-gradient(90deg, 
+                        #22d3ee 0%, 
+                        #60a5fa 15%,
+                        #a78bfa 30%,
+                        #ec4899 50%,
+                        #a78bfa 70%,
+                        #60a5fa 85%,
+                        #22d3ee 100%
+                    );
+                    background-size: 300% 100%;
+                    filter: blur(18px) saturate(180%);
+                    opacity: 0.9;
+                    animation: flowGradient 8s ease-in-out infinite;
+                }
+                
+                /* Additional top glow band */
+                .neon-edge::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(90deg, 
+                        rgba(167,139,250,0.6) 0%,
+                        rgba(34,211,238,0.7) 50%,
+                        rgba(167,139,250,0.6) 100%
+                    );
+                    background-size: 200% 100%;
+                    filter: blur(25px) saturate(170%);
+                    animation: flowGradient 6s ease-in-out infinite reverse;
+                }
+                
+                /* Soft horizontal halo with breathing effect */
+                .neon-halo{ position:absolute; left:-5%; right:-5%; bottom:45%; height:200px; z-index:-1; pointer-events:none;
+                    background: radial-gradient(ellipse 130% 150% at 50% 100%, 
+                        rgba(56,189,248,0.65) 0%,
+                        rgba(167,139,250,0.6) 20%,
+                        rgba(34,211,238,0.5) 40%,
+                        rgba(99,102,241,0.4) 60%,
+                        rgba(0,0,0,0) 100%
+                    );
+                    filter: blur(40px) saturate(160%);
+                    opacity: 0.85;
+                    animation: breatheGlow 8s ease-in-out infinite alternate;
+                }
+                
+                /* Smoky layer - Left drift */
+                .neon-halo::before {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient(ellipse 110% 140% at 30% 100%, 
+                        rgba(167,139,250,0.55) 0%,
+                        rgba(99,102,241,0.45) 25%,
+                        rgba(236,72,153,0.3) 50%,
+                        rgba(0,0,0,0) 75%
+                    );
+                    filter: blur(35px);
+                    animation: driftLeft 12s ease-in-out infinite alternate;
+                }
+                
+                /* Smoky layer - Right drift */
+                .neon-halo::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient(ellipse 110% 140% at 70% 100%, 
+                        rgba(34,211,238,0.55) 0%,
+                        rgba(56,189,248,0.45) 25%,
+                        rgba(99,102,241,0.3) 50%,
+                        rgba(0,0,0,0) 75%
+                    );
+                    filter: blur(35px);
+                    animation: driftRight 10s ease-in-out infinite alternate;
+                }
+                
+                /* Animations */
+                @keyframes smoothRotate { 
+                    to { transform: rotate(360deg); } 
+                }
+                
+                @keyframes smoothRotateReverse { 
+                    to { transform: rotate(-360deg); } 
+                }
+                
+                @keyframes flowGradient { 
+                    0%, 100% { background-position: 0% 50%; }
+                    50% { background-position: 100% 50%; }
+                }
+                
+                @keyframes breatheGlow { 
+                    0% { transform: translateY(0) scale(1); opacity: 0.85; }
+                    100% { transform: translateY(-10px) scale(1.04); opacity: 0.95; }
+                }
+                
+                @keyframes driftLeft {
+                    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0.9; }
+                    100% { transform: translateX(-15px) translateY(-8px) rotate(-5deg); opacity: 1; }
+                }
+                
+                @keyframes driftRight {
+                    0% { transform: translateX(0) translateY(0) rotate(0deg); opacity: 0.9; }
+                    100% { transform: translateX(15px) translateY(-8px) rotate(5deg); opacity: 1; }
+                }
 
                     /* Mockup frame with animated gradient border glow */
                     .mockup{ position:relative; z-index:2; width:100%; height:100%; border-radius:18px; padding:2px; }
                     .mockup::before{ content:''; position:absolute; inset:-6px; border-radius:22px;
-                        background: linear-gradient(120deg, rgba(34,211,238,.55), rgba(96,165,250,.55), rgba(167,139,250,.55), rgba(34,211,238,.55));
-                        background-size: 300% 100%; filter: blur(14px); opacity:.85; z-index:-1; animation: edgeRun 8s ease-in-out infinite;
+                        background: linear-gradient(120deg, rgba(34,211,238,.6), rgba(96,165,250,.6), rgba(167,139,250,.6), rgba(236,72,153,.5), rgba(34,211,238,.6));
+                        background-size: 300% 100%; filter: blur(14px); opacity:.9; z-index:-1; animation: flowGradient 8s ease-in-out infinite;
                     }
                                         .placeholder{
                         position:relative; width:100%; height:100%; 
@@ -163,7 +303,8 @@
         }
     </style>
 </head>
-<body>
+<body data-barba="wrapper">
+    <div data-barba="container" data-barba-namespace="home">
     <header class="container nav">
         <div class="brand">
             <div class="logo">
@@ -207,8 +348,8 @@
   
         <!-- Features Section -->
         <section id="features" class="container" style="padding:64px 24px 88px;">
-            <h2 style="font-family:var(--font-heading); font-size:38px; margin:0 auto 18px; letter-spacing:-0.5px; max-width:calc(var(--container-max) / var(--phi)); text-align:center;">What Vani can do</h2>
-            <p style="color:var(--text-muted); margin:0 auto 36px; max-width:calc(var(--container-max) / var(--phi)); text-align:center; font-size:16px; line-height:1.5;">Everything you need to run flood‑related crop insurance—end to end.</p>
+            <h2 style="font-family:var(--font-heading); font-size:38px; margin:0 auto 18px; letter-spacing:-0.5px; max-width:calc(var(--container-max) / var(--phi)); text-align:center; position:relative; z-index:5;">What Vani can do</h2>
+            <p style="color:var(--text-muted); margin:0 auto 36px; max-width:calc(var(--container-max) / var(--phi)); text-align:center; font-size:16px; line-height:1.5; position:relative; z-index:5;">Everything you need to run flood‑related crop insurance—end to end.</p>
             <div style="display:grid; grid-template-columns:repeat( auto-fit, minmax(280px, 1fr) ); gap:20px; align-items:stretch; max-width:var(--container-max); margin:0 auto;">
                 <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
                     <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
