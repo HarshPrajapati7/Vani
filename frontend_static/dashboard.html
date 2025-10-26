@@ -1,0 +1,1435 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vani - Dashboard</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+<!-- Clerk Authentication -->
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_bWVycnktbW9sbHVzay03NS5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://merry-mollusk-75.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
+
+<style>
+:root{
+  --dark-forest:#0a3d2c; --deep-green:#0f5538; --emerald:#10b981;
+  --mint:#34d399; --sage:#6ee7b7; --light-mint:#d1fae5;
+  --bg:#f5f7fa; --card:#ffffff; --border:#e2e8f0; --danger:#dc2626;
+  --warning:#f59e0b; --info:#0ea5e9; --text:#1e293b; --text-muted:#64748b;
+  --sidebar:#ffffff; --sidebar-hover:rgba(16, 185, 129, 0.08); --success:#10b981;
+  --font-heading:'Playfair Display', Georgia, serif;
+  --font-body:'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --phi:1.618; --container-max:1280px;
+}
+*{margin:0; padding:0; box-sizing:border-box;}
+body{font-family:var(--font-body); 
+     background:var(--bg); color:var(--text); letter-spacing:-0.01em;
+     position:relative; overflow:hidden;}
+.dashboard{display:flex; height:100vh; position:relative; z-index:1;}
+
+/* Sidebar */
+.sidebar{
+  width:280px; 
+  background:var(--card);
+  color:var(--text); display:flex; flex-direction:column; 
+  box-shadow:2px 0 16px rgba(0, 0, 0, 0.06);
+  position:relative; border-right:1px solid var(--border);
+}
+.sidebar::before{
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  background:linear-gradient(180deg, rgba(16, 185, 129, 0.02) 0%, transparent 100%);
+  pointer-events:none;
+}
+.logo{padding:28px 24px; font-size:24px; font-weight:700; border-bottom:1px solid var(--border);
+      position:relative; z-index:1; letter-spacing:-0.5px; font-family:var(--font-heading); color:var(--dark-forest);}
+.nav{flex:1; padding:20px 0; position:relative; z-index:1;}
+.nav-item{
+  padding:14px 24px; cursor:pointer; display:flex; align-items:center; gap:14px; 
+  transition:all .25s cubic-bezier(0.4, 0, 0.2, 1); border-left:3px solid transparent; 
+  position:relative; font-weight:500; font-size:15px; margin:4px 12px; border-radius:8px;
+  font-family:var(--font-body); color:var(--text-muted);
+}
+.nav-item::before{
+  content:''; position:absolute; left:0; top:0; bottom:0; right:0;
+  background:rgba(16, 185, 129, 0.05);
+  opacity:0; transition:opacity .25s; border-radius:8px;
+}
+.nav-item:hover{background:rgba(16, 185, 129, 0.08); border-left-color:var(--emerald); transform:translateX(2px); color:var(--text);}
+.nav-item:hover::before{opacity:1;}
+.nav-item.active{background:rgba(16, 185, 129, 0.12); border-left-color:var(--mint);
+                 box-shadow:0 4px 12px rgba(16, 185, 129, 0.15); color:var(--emerald); font-weight:600;}
+.nav-icon{width:22px; height:22px;}
+.user-info{padding:20px 24px; border-top:1px solid var(--border); display:flex; align-items:center; gap:14px;
+           position:relative; z-index:1; background:var(--bg); cursor:pointer; transition:background .25s;}
+.user-info:hover{background:var(--sidebar-hover);}
+.avatar{width:44px; height:44px; border-radius:50%; 
+        background:linear-gradient(135deg, var(--emerald), var(--mint)); 
+        display:flex; align-items:center; justify-content:center; font-weight:700; font-size:16px; color:#fff;
+        box-shadow:0 4px 12px rgba(16, 185, 129, 0.3), inset 0 2px 4px rgba(255,255,255,0.2);}
+.user-name{font-weight:600; font-size:14px; color:var(--text);}
+.user-role{font-size:12px; color:var(--text-muted); opacity:0.8;}
+
+/* Main Content */
+.main{flex:1; display:flex; flex-direction:column; overflow:hidden; background:var(--bg);}
+.topbar{
+  height:72px; background:rgba(255,255,255,0.95); border-bottom:1px solid var(--border); 
+  display:flex; align-items:center; justify-content:space-between; padding:0 32px; 
+  box-shadow:0 2px 8px rgba(10, 61, 44, 0.06);
+  backdrop-filter:blur(10px);
+}
+.menu-btn{display:none; background:transparent; border:1px solid var(--border); border-radius:8px; padding:8px; cursor:pointer;}
+.menu-btn svg{display:block}
+.topbar-left{display:flex; align-items:center; gap:16px;}
+.page-title{
+  font-size:24px; font-weight:700; color:var(--dark-forest); letter-spacing:-0.5px;
+  font-family:var(--font-heading);
+}
+.topbar-right{display:flex; align-items:center; gap:16px;}
+.badge{padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; letter-spacing:-0.01em; font-family:var(--font-body);}
+.badge-success{background:rgba(16, 185, 129, 0.1); 
+               color:var(--deep-green); border:1px solid rgba(16, 185, 129, 0.2);}
+.badge-warning{background:rgba(245, 158, 11, 0.1); 
+               color:#b45309; border:1px solid rgba(245, 158, 11, 0.2);}
+.badge-danger{background:rgba(220, 38, 38, 0.1); 
+              color:#991b1b; border:1px solid rgba(220, 38, 38, 0.2);}
+
+/* Content Area */
+.content{flex:1; overflow-y:auto; padding:32px; background:var(--bg);}
+.page{display:none;}
+.page.active{display:block; max-width:var(--container-max); margin:0 auto;}
+
+/* Cards */
+.stats-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px; margin-bottom:24px;}
+.stat-card{
+  background:var(--card); border-radius:16px; padding:24px; 
+  box-shadow:0 2px 8px rgba(10, 61, 44, 0.06), 0 0 0 1px rgba(16, 185, 129, 0.05); 
+  border:1px solid var(--border);
+  position:relative; overflow:hidden;
+  transition:all .25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.stat-card::before{
+  content:''; position:absolute; top:0; left:0; right:0; height:3px;
+  background:linear-gradient(90deg, var(--emerald), var(--mint), var(--sage));
+}
+.stat-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 8px 24px rgba(10, 61, 44, 0.12), 0 0 0 1px rgba(16, 185, 129, 0.1);
+}
+.stat-label{color:var(--text-muted); font-size:14px; font-weight:600; margin-bottom:8px; letter-spacing:-0.01em; font-family:var(--font-body);}
+.stat-value{font-size:36px; font-weight:700; margin-bottom:4px; color:var(--dark-forest); letter-spacing:-1px; font-family:var(--font-heading);}
+.stat-change{font-size:13px; font-weight:600; font-family:var(--font-body);}
+.stat-change.up{color:var(--emerald);}
+.stat-change.down{color:var(--danger);}
+
+.card{
+  background:var(--card); border-radius:16px; padding:28px; 
+  box-shadow:0 2px 8px rgba(10, 61, 44, 0.06), 0 0 0 1px rgba(16, 185, 129, 0.05); 
+  border:1px solid var(--border); margin-bottom:24px;
+  position:relative; overflow:hidden;
+}
+.card::after{
+  content:''; position:absolute; top:-20px; right:-20px; width:120px; height:120px;
+  background:radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
+  pointer-events:none;
+}
+.card-title{font-size:20px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;
+            color:var(--dark-forest); letter-spacing:-0.5px; font-family:var(--font-heading);}
+
+/* Charts: fixed-height containers to prevent oversized canvases */
+.chart-box{ position:relative; height:280px; }
+.chart-box.small{ height:200px; }
+.chart-box canvas{ width:100% !important; height:100% !important; display:block; }
+
+/* Map */
+#map{height:500px; border-radius:16px; box-shadow:0 2px 8px rgba(10, 61, 44, 0.08), 0 0 0 1px rgba(16, 185, 129, 0.05);}
+
+/* Forms */
+.form-group{margin-bottom:20px;}
+.form-label{display:block; font-size:14px; font-weight:600; margin-bottom:8px; color:var(--text); letter-spacing:-0.01em; font-family:var(--font-body);}
+.form-control{width:100%; padding:12px 14px; border:1px solid var(--border); border-radius:10px; font-size:15px; 
+              transition:all .2s; background:var(--card); color:var(--text); font-family:var(--font-body);}
+.form-control:focus{outline:none; border-color:var(--emerald); box-shadow:0 0 0 3px rgba(16,185,129,0.1);}
+.form-row{display:grid; grid-template-columns:1fr 1fr; gap:20px;}
+
+/* Buttons */
+.btn{
+  padding:12px 24px; border:none; border-radius:10px; font-size:15px; font-weight:600; 
+  cursor:pointer; transition:all .25s cubic-bezier(0.4, 0, 0.2, 1); 
+  display:inline-flex; align-items:center; gap:10px;
+  position:relative; overflow:hidden; letter-spacing:-0.01em;
+}
+.btn::before{
+  content:''; position:absolute; top:50%; left:50%; width:0; height:0;
+  border-radius:50%; background:rgba(255,255,255,0.25);
+  transition:width .4s, height .4s, top .4s, left .4s;
+}
+.btn:hover::before{
+  width:300px; height:300px; top:-50px; left:-50px;
+}
+.btn-primary{
+  background:linear-gradient(135deg, var(--emerald), var(--mint)); 
+  color:#fff;
+  box-shadow:0 4px 12px rgba(16, 185, 129, 0.25);
+}
+.btn-primary:hover{
+  transform:translateY(-1px); 
+  box-shadow:0 6px 20px rgba(16, 185, 129, 0.35);
+}
+.btn-secondary{
+  background:var(--card); color:var(--text); 
+  border:1px solid var(--border);
+  box-shadow:0 2px 6px rgba(10, 61, 44, 0.06);
+}
+.btn-secondary:hover{
+  background:rgba(16, 185, 129, 0.05);
+  border-color:var(--emerald);
+}
+.btn-danger{
+  background:linear-gradient(135deg, #dc2626, #ef4444); 
+  color:#fff;
+  box-shadow:0 4px 12px rgba(220, 38, 38, 0.25);
+}
+.btn-sm{padding:8px 16px; font-size:14px;}
+
+/* Table */
+.table{width:100%; border-collapse:collapse;}
+.table th{text-align:left; padding:14px 16px; border-bottom:2px solid var(--border); font-size:13px; 
+          font-weight:700; color:var(--text-muted); text-transform:uppercase; letter-spacing:0.02em;}
+.table td{padding:14px 16px; border-bottom:1px solid var(--border); font-size:14px;}
+.table tr:hover{background:rgba(16, 185, 129, 0.02);}
+.table-responsive{width:100%; overflow-x:auto; -webkit-overflow-scrolling:touch;}
+
+/* Layer Controls */
+.map-controls{position:absolute; top:80px; right:24px; z-index:1000; background:var(--card); 
+              border-radius:16px; padding:20px; 
+              box-shadow:0 4px 16px rgba(10, 61, 44, 0.12), 0 0 0 1px rgba(16, 185, 129, 0.05); 
+              min-width:220px;}
+.map-controls h4{font-size:15px; font-weight:700; margin-bottom:16px; color:var(--dark-forest); letter-spacing:-0.02em;}
+.layer-toggle{display:flex; align-items:center; gap:10px; margin-bottom:10px; cursor:pointer; 
+              padding:8px; border-radius:8px; transition:all .2s;}
+.layer-toggle:hover{background:rgba(16, 185, 129, 0.05);}
+.toggle-switch{width:44px; height:24px; background:#e5e7eb; border-radius:12px; position:relative; transition:all .2s;}
+.toggle-switch.active{background:var(--emerald);}
+.toggle-switch::after{content:''; position:absolute; width:18px; height:18px; border-radius:50%; background:#fff; 
+                     top:3px; left:3px; transition:all .2s; box-shadow:0 2px 4px rgba(0,0,0,0.1);}
+.toggle-switch.active::after{left:23px;}
+
+/* Timeline */
+.timeline{position:relative; padding-left:32px;}
+.timeline-item{position:relative; padding-bottom:28px;}
+.timeline-item::before{content:''; position:absolute; left:-26px; top:4px; width:14px; height:14px; border-radius:50%; 
+                       background:var(--emerald); border:3px solid var(--card); box-shadow:0 0 0 3px rgba(16, 185, 129, 0.1);}
+.timeline-item::after{content:''; position:absolute; left:-20px; top:18px; width:2px; height:calc(100% - 14px); background:var(--border);}
+.timeline-item:last-child::after{display:none;}
+.timeline-content{background:var(--card); padding:16px; border-radius:12px; border:1px solid var(--border);
+                  box-shadow:0 2px 6px rgba(10, 61, 44, 0.06);}
+.timeline-date{font-size:13px; color:var(--text-muted); margin-bottom:6px; font-weight:600;}
+.timeline-title{font-weight:600; margin-bottom:6px; color:var(--dark-forest); font-size:15px;}
+
+/* Weather Cards */
+.weather-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:20px;}
+.weather-card{background:linear-gradient(135deg, var(--emerald) 0%, var(--deep-green) 100%); 
+             color:#fff; border-radius:16px; padding:24px; text-align:center;
+             box-shadow:0 4px 16px rgba(16, 185, 129, 0.25); transition:all .25s;}
+.weather-card:hover{transform:translateY(-2px); box-shadow:0 8px 24px rgba(16, 185, 129, 0.35);}
+.weather-card h3{font-size:52px; margin:20px 0 10px; font-weight:700; letter-spacing:-2px;}
+.weather-card h3{font-size:48px; margin:16px 0 8px;}
+.weather-card p{opacity:0.9; font-size:14px;}
+
+/* Tabs (Weather/Advisory) */
+.tabs{display:flex; gap:8px; border-bottom:1px solid var(--border); margin:-4px -4px 16px; padding:0 4px; overflow-x:auto;}
+.tab{background:transparent; border:none; padding:10px 12px; cursor:pointer; color:var(--text-muted); white-space:nowrap; border-bottom:2px solid transparent; border-radius:4px 4px 0 0; font-weight:600;}
+.tab:focus{outline:none; box-shadow:0 0 0 3px rgba(16,185,129,0.15); border-radius:6px;}
+.tab.active{color:var(--dark-forest); border-bottom-color:var(--emerald);} 
+.tab-content{display:none;}
+.tab-content.active{display:block;}
+
+/* Current Weather grid responsive */
+.current-weather-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;}
+@media (max-width: 1024px){ .current-weather-grid{grid-template-columns:repeat(2, 1fr);} }
+@media (max-width: 640px){ .current-weather-grid{grid-template-columns:1fr;} }
+
+/* Risk Alert */
+.alert{padding:16px; border-radius:8px; margin-bottom:16px; display:flex; align-items:center; gap:12px;}
+.alert-warning{background:#fef3c7; border-left:4px solid var(--warning); color:#92400e;}
+.alert-danger{background:#fee2e2; border-left:4px solid var(--danger); color:#991b1b;}
+.alert-info{background:#dbeafe; border-left:4px solid var(--info); color:#1e40af;}
+
+/* Collapsible cards (details/summary) */
+details.card{padding:0}
+details.card > summary.card-title{margin:0; padding:20px 28px; outline:none; cursor:pointer; user-select:none; display:flex; align-items:center; justify-content:space-between;}
+details.card > summary::-webkit-details-marker{display:none}
+details.card .collapse-body{padding:0 28px 24px}
+details.card .caret{transition:transform .2s ease}
+details.card[open] .caret{transform:rotate(180deg)}
+
+/* Responsive: mobile-first adjustments */
+@media (max-width: 1024px){
+  .dashboard{flex-direction:column;}
+  .sidebar{position:fixed; z-index:2000; inset:0 auto 0 0; width:280px; transform:translateX(-100%); transition:transform .25s ease; box-shadow:4px 0 24px rgba(0,0,0,0.15);} 
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .menu-btn{display:inline-flex}
+}
+@media (max-width: 840px){
+  #map{height:420px}
+  .chart-box{height:240px}
+  .chart-box.small{height:180px}
+  .stats-grid{grid-template-columns:repeat(2, 1fr)}
+}
+@media (max-width: 640px){
+  .stats-grid{grid-template-columns:1fr}
+  .topbar{padding:0 16px; height:64px}
+  .page-title{font-size:20px}
+  .content{padding:20px; padding-bottom:88px} /* reserve space for bottom nav */
+  .card{padding:20px}
+  #map{height:360px}
+  .chart-box{height:200px}
+  .chart-box.small{height:160px}
+}
+
+/* Bottom navigation (mobile) */
+.bottom-nav{position:fixed; left:0; right:0; bottom:0; height:64px; background:var(--card); border-top:1px solid var(--border); box-shadow:0 -2px 8px rgba(10, 61, 44, 0.06); display:none; z-index:1500;}
+.bottom-nav .bn-wrap{display:flex; height:100%;}
+.bn-item{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; gap:6px; cursor:pointer;}
+.bn-item svg{width:20px; height:20px;}
+.bn-item.active{color:var(--emerald); font-weight:600;}
+@media (max-width: 640px){ .bottom-nav{display:block} }
+</style>
+</head>
+<body>
+<div class="dashboard">
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="logo">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="display:inline-block; margin-right:8px; vertical-align:middle;">
+        <path d="M3 15C3 15 4.5 14 6 14C7.5 14 7.5 15 9 15C10.5 15 10.5 14 12 14C13.5 14 13.5 15 15 15C16.5 15 16.5 14 18 14C19.5 14 21 15 21 15V20H3V15Z" fill="white" opacity="0.6"/>
+        <path d="M3 11C3 11 4.5 10 6 10C7.5 10 7.5 11 9 11C10.5 11 10.5 10 12 10C13.5 10 13.5 11 15 11C16.5 11 16.5 10 18 10C19.5 10 21 11 21 11V15C21 15 19.5 14 18 14C16.5 14 16.5 15 15 15C13.5 15 13.5 14 12 14C10.5 14 10.5 15 9 15C7.5 15 7.5 14 6 14C4.5 14 3 15 3 15V11Z" fill="white"/>
+      </svg>
+      Vani
+    </div>
+    <div class="nav">
+  <div class="nav-item active" onclick="showPage('home', this)">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
+        </svg>
+        <span>Dashboard</span>
+      </div>
+  <div class="nav-item" onclick="showPage('farms', this)">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+        </svg>
+        <span>Farm Management</span>
+      </div>
+  <div class="nav-item" onclick="showPage('claims', this)">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
+        </svg>
+        <span>Claims Tracking</span>
+      </div>
+  <div class="nav-item" onclick="showPage('weather', this)">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
+        </svg>
+        <span>Weather & Advisory</span>
+      </div>
+  <div class="nav-item" onclick="showPage('admin', this)">
+        <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24m15.66-4.24l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
+        </svg>
+        <span>Admin Panel</span>
+      </div>
+    </div>
+    <div class="user-info" style="cursor: pointer;" onclick="logout()" title="Click to sign out">
+      <div class="avatar">U</div>
+      <div>
+        <div style="font-weight:600; font-size:14px;">User</div>
+        <div style="font-size:12px; opacity:0.7;">Loading...</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main">
+    <div class="topbar">
+      <div class="topbar-left">
+        <button class="menu-btn" onclick="toggleSidebar()" aria-label="Toggle menu">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+        </button>
+        <div class="page-title">Dashboard</div>
+      </div>
+      <div class="topbar-right">
+        <span class="badge badge-success">● System Online</span>
+        <button class="btn btn-sm btn-primary" onclick="refreshData()">Refresh Data</button>
+      </div>
+    </div>
+
+    <div class="content">
+      <!-- Home/Dashboard Page -->
+      <div id="home" class="page active">
+        <!-- Stats Grid at Top -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <div class="stat-label">Total Farms</div>
+            <div class="stat-value">342</div>
+            <div class="stat-change up">↑ 12% this month</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Active Claims</div>
+            <div class="stat-value">47</div>
+            <div class="stat-change down">↓ 5% pending</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-label">Flood Affected</div>
+            <div class="stat-value">23.4%</div>
+            <div class="stat-change up">↑ 8% this week</div>
+          </div>
+          <div class="stat-card" id="weatherStatCard" style="background:linear-gradient(135deg, rgba(16, 185, 129, 0.08), rgba(16, 185, 129, 0.02)); cursor:pointer;" onclick="showPage('weather', null); syncBottomNav('weather')">
+            <div class="stat-label">Current Weather</div>
+            <div class="stat-value" id="currentTemp" style="font-size:28px;">--°C</div>
+            <div class="stat-change" id="currentDesc" style="color:var(--text-muted);">Loading...</div>
+          </div>
+        </div>
+
+        <!-- Main Content Grid: Map (Center) + Sidebar (Right) -->
+        <div style="display:grid; grid-template-columns:1fr 380px; gap:24px; margin-bottom:24px;">
+          <!-- Map Card - Main Focus -->
+          <div class="card" style="min-height:600px;">
+            <div class="card-title">
+              <span>Live Farm Monitor</span>
+              <button class="btn btn-sm btn-primary" onclick="runTriage()">Run Analysis</button>
+            </div>
+            <div id="map" style="height:520px;"></div>
+          </div>
+
+          <!-- Right Sidebar -->
+          <div style="display:flex; flex-direction:column; gap:20px;">
+            <!-- Recent Activity -->
+            <div class="card" style="padding:20px;">
+              <div class="card-title" style="font-size:16px; margin-bottom:16px;">Recent Activity</div>
+              <div class="timeline">
+                <div class="timeline-item">
+                  <div class="timeline-content">
+                    <div class="timeline-date">2 hours ago</div>
+                    <div class="timeline-title">Claim #2301 Updated</div>
+                    <p style="font-size:13px; color:var(--text-muted); margin:4px 0 0;">Status changed to verified</p>
+                  </div>
+                </div>
+                <div class="timeline-item">
+                  <div class="timeline-content">
+                    <div class="timeline-date">5 hours ago</div>
+                    <div class="timeline-title">New Farm Added</div>
+                    <p style="font-size:13px; color:var(--text-muted); margin:4px 0 0;">F-2315 registered in system</p>
+                  </div>
+                </div>
+                <div class="timeline-item" style="padding-bottom:0;">
+                  <div class="timeline-content">
+                    <div class="timeline-date">1 day ago</div>
+                    <div class="timeline-title">Weather Alert</div>
+                    <p style="font-size:13px; color:var(--text-muted); margin:4px 0 0;">Heavy rainfall predicted</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Quick Stats Chart -->
+            <div class="card" style="padding:20px;">
+              <div class="card-title" style="font-size:16px; margin-bottom:16px;">Claim Status</div>
+                <div class="chart-box small"><canvas id="claimChart" class="chart-canvas"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Charts Row -->
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:24px;">
+          <div class="card">
+            <div class="card-title">Flood Trend Analysis</div>
+            <div class="chart-box"><canvas id="floodChart" class="chart-canvas"></canvas></div>
+          </div>
+          <div class="card">
+            <div class="card-title">Model Performance</div>
+            <div class="chart-box"><canvas id="performanceChart" class="chart-canvas"></canvas></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Map Layer Controls (Floating) -->
+      <div class="map-controls" style="display:none;">
+        <h4>Map Layers</h4>
+        <div class="layer-toggle" onclick="toggleLayer('satellite')">
+          <div class="toggle-switch active"></div>
+          <span>Satellite View</span>
+        </div>
+        <div class="layer-toggle" onclick="toggleLayer('flood')">
+          <div class="toggle-switch"></div>
+          <span>Flood Detection</span>
+        </div>
+        <div class="layer-toggle" onclick="toggleLayer('boundaries')">
+          <div class="toggle-switch active"></div>
+          <span>Field Boundaries</span>
+        </div>
+      </div>
+
+        <div style="display:grid; grid-template-columns:1fr; gap:20px;">
+          <div class="card">
+            <div class="card-title">Recent Claims</div>
+            <div class="table-responsive">
+            <table class="table">
+              <thead>
+                <tr><th>Farm ID</th><th>Status</th><th>Flood %</th><th>Action</th></tr>
+              </thead>
+              <tbody id="claimsTable">
+                <tr><td>F-2301</td><td><span class="badge badge-warning">Pending</span></td><td>42%</td><td>
+                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2301')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    PDF
+                  </button>
+                </td></tr>
+                <tr><td>F-2298</td><td><span class="badge badge-success">Verified</span></td><td>56%</td><td>
+                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2298')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    PDF
+                  </button>
+                </td></tr>
+                <tr><td>F-2289</td><td><span class="badge badge-danger">Rejected</span></td><td>18%</td><td>
+                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2289')">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
+                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
+                    </svg>
+                    PDF
+                  </button>
+                </td></tr>
+              </tbody>
+            </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Farm Management Page -->
+      <div id="farms" class="page">
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">
+            <span>Add New Farm</span>
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <button class="btn btn-sm btn-primary" onclick="gpsAutoLocate()" style="margin-bottom:16px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;">
+                <circle cx="12" cy="12" r="10"/>
+                <circle cx="12" cy="12" r="3"/>
+                <line x1="12" y1="2" x2="12" y2="6"/>
+                <line x1="12" y1="18" x2="12" y2="22"/>
+                <line x1="2" y1="12" x2="6" y2="12"/>
+                <line x1="18" y1="12" x2="22" y2="12"/>
+              </svg>
+              GPS Auto-Locate
+            </button>
+  <div style="display:grid; grid-template-columns:1.618fr 1fr; gap:24px; margin-bottom:24px; align-items:start;">
+  <div style="display:grid; grid-template-columns:1.618fr 1fr; gap:24px; align-items:start;">
+                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                  <span>Claim #C-1024 Verified</span>
+                </div>
+                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                  <span>Claim #C-1019 Submitted</span>
+                </div>
+                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12"/><path d="M6 8h12"/><path d="M6 16h12"/><path d="M8 20h8"/></svg>
+                  <span>Claim #C-1012 Settled</span>
+                </div>
+          <form id="farmForm" onsubmit="submitFarm(event)">
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Farmer Name *</label>
+                <input type="text" class="form-control" id="farmerName" placeholder="Enter farmer name" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Phone Number *</label>
+                <input type="tel" class="form-control" id="farmerPhone" placeholder="+91 98765 43210" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Farm Location (Lat, Long) *</label>
+                <input type="text" class="form-control" id="farmLocation" placeholder="20.2961, 85.8245" required>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Farm Area (hectares) *</label>
+                <input type="number" class="form-control" id="farmArea" placeholder="2.5" step="0.1" required>
+              </div>
+            </div>
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label">Crop Type *</label>
+                <select class="form-control" id="cropType" required>
+                  <option value="">Select crop</option>
+                  <option value="rice">Rice (Paddy)</option>
+                  <option value="wheat">Wheat</option>
+                  <option value="maize">Maize</option>
+                  <option value="sugarcane">Sugarcane</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label class="form-label">Sowing Date *</label>
+                <input type="date" class="form-control" id="sowingDate" required>
+              </div>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Variety / Notes</label>
+              <input type="text" class="form-control" id="variety" placeholder="MTU 1010, Swarna etc.">
+            </div>
+            <button type="submit" class="btn btn-primary">Submit Farm Details</button>
+          </form>
+          </div>
+        </details>
+
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">Registered Farms
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr><th>Farm ID</th><th>Farmer</th><th>Location</th><th>Crop</th><th>Area (ha)</th><th>Status</th></tr>
+                </thead>
+                <tbody id="farmsTable">
+                  <tr><td>F-2301</td><td>Ramesh Kumar</td><td>20.29, 85.82</td><td>Rice</td><td>3.2</td><td><span class="badge badge-success">Active</span></td></tr>
+                  <tr><td>F-2298</td><td>Suresh Patel</td><td>20.31, 85.79</td><td>Rice</td><td>2.8</td><td><span class="badge badge-warning">Pending</span></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Claims Tracking Page -->
+      <div id="claims" class="page">
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">Claim Status Pipeline
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Submitted</div>
+                <div class="stat-value" style="color:var(--info);">28</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Under Review</div>
+                <div class="stat-value" style="color:var(--warning);">12</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Verified</div>
+                <div class="stat-value" style="color:var(--primary);">34</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Settled</div>
+                <div class="stat-value" style="color:var(--secondary);">87</div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">Recent Claims Timeline
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <div class="timeline">
+              <div class="timeline-item">
+                <div class="timeline-content">
+                  <div class="timeline-date">Oct 25, 2025 - 3:45 PM</div>
+                  <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                    <span>Claim #C-1024 Verified</span>
+                  </div>
+                  <div>Farm F-2298 | Flood affected: 56% | Payout approved: ₹85,000</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-content">
+                  <div class="timeline-date">Oct 24, 2025 - 11:20 AM</div>
+                  <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                    <span>Claim #C-1019 Submitted</span>
+                  </div>
+                  <div>Farm F-2301 | Flood affected: 42% | Under review</div>
+                </div>
+              </div>
+              <div class="timeline-item">
+                <div class="timeline-content">
+                  <div class="timeline-date">Oct 23, 2025 - 9:15 AM</div>
+                  <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/><text x="12" y="15" text-anchor="middle" font-size="8" fill="currentColor" stroke="none">₹</text></svg>
+                    <span>Claim #C-1012 Settled</span>
+                  </div>
+                  <div>Farm F-2289 | Payout transferred successfully</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+
+      <!-- Weather & Advisory Page -->
+      <div id="weather" class="page">
+        <div class="card">
+          <div class="tabs" role="tablist" aria-label="Weather tabs">
+            <button class="tab active" role="tab" aria-selected="true" data-tab="tab-weather">Weather</button>
+            <button class="tab" role="tab" aria-selected="false" data-tab="tab-advisory">Advisory</button>
+          </div>
+
+          <div id="tab-weather" class="tab-content active" role="tabpanel">
+            <div class="card-title">Current Weather</div>
+            <div id="currentWeather" class="current-weather-grid">
+              <!-- Current weather will be loaded -->
+            </div>
+
+            <div class="card-title" style="margin-top:16px;">7-Day Weather Forecast</div>
+            <div class="weather-grid" id="weatherGrid">
+              <!-- Weather cards will be dynamically loaded -->
+            </div>
+
+            <div class="card-title" style="margin-top:16px;">7-Day Rainfall Forecast</div>
+            <div class="chart-box"><canvas id="rainfallChart" class="chart-canvas"></canvas></div>
+          </div>
+
+          <div id="tab-advisory" class="tab-content" role="tabpanel" aria-labelledby="Advisory">
+            <div class="card-title">Risk Alerts & Advisories</div>
+            <div id="weatherAlerts"><!-- Dynamic alerts will be loaded here --></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Admin Panel Page -->
+      <div id="admin" class="page">
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">System Overview
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <div class="stats-grid">
+              <div class="stat-card">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value">1,245</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Model Accuracy</div>
+                <div class="stat-value">94.2%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">API Uptime</div>
+                <div class="stat-value">99.8%</div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-label">Claims Processed</div>
+                <div class="stat-value">2,847</div>
+              </div>
+            </div>
+          </div>
+        </details>
+
+        <details class="card mobile-collapsible" open>
+          <summary class="card-title">All Claims (Admin View)
+            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+          </summary>
+          <div class="collapse-body">
+            <div class="table-responsive">
+              <table class="table">
+                <thead>
+                  <tr><th>Claim ID</th><th>Farm ID</th><th>Farmer</th><th>Flood %</th><th>Confidence</th><th>Status</th><th>Action</th></tr>
+                </thead>
+                <tbody>
+                  <tr><td>C-1024</td><td>F-2298</td><td>Suresh Patel</td><td>56%</td><td>96%</td><td><span class="badge badge-success">Verified</span></td><td><button class="btn btn-sm btn-primary">Approve</button></td></tr>
+                  <tr><td>C-1019</td><td>F-2301</td><td>Ramesh Kumar</td><td>42%</td><td>93%</td><td><span class="badge badge-warning">Pending</span></td><td><button class="btn btn-sm btn-secondary">Review</button></td></tr>
+                  <tr><td>C-1012</td><td>F-2289</td><td>Prakash Singh</td><td>18%</td><td>89%</td><td><span class="badge badge-danger">Rejected</span></td><td><button class="btn btn-sm btn-secondary">View</button></td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </details>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Bottom Navigation (mobile) -->
+<nav class="bottom-nav" role="navigation" aria-label="Primary">
+  <div class="bn-wrap">
+    <div class="bn-item active" data-target="home" onclick="showPage('home', null); syncBottomNav('home')" aria-label="Dashboard">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      <span>Home</span>
+    </div>
+    <div class="bn-item" data-target="farms" onclick="showPage('farms', null); syncBottomNav('farms')" aria-label="Farms">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+      <span>Farms</span>
+    </div>
+    <div class="bn-item" data-target="claims" onclick="showPage('claims', null); syncBottomNav('claims')" aria-label="Claims">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span>Claims</span>
+    </div>
+    <div class="bn-item" data-target="weather" onclick="showPage('weather', null); syncBottomNav('weather')" aria-label="Weather">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
+      <span>Weather</span>
+    </div>
+    <div class="bn-item" data-target="admin" onclick="showPage('admin', null); syncBottomNav('admin')" aria-label="Admin">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24m15.66-4.24l-4.24-4.24m-4.24-4.24l-4.24-4.24"/></svg>
+      <span>Admin</span>
+    </div>
+  </div>
+  </nav>
+
+<script>
+// Global state
+let map, fieldsLayer, selectedField, selectedLayer, maskOverlay;
+const defaultBase = (location.hostname === 'localhost' || location.hostname === '127.0.0.1')
+  ? 'http://localhost:8000'
+  : '/api'; // For Netlify, proxy /api/* to your backend via _redirects
+const API_BASE = (window.__API_BASE__
+  || new URLSearchParams(window.location.search).get('api')
+  || defaultBase).replace(/\/$/, '');
+
+// Page navigation
+function showPage(pageId, el) {
+  // Hide all pages and remove nav active
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+
+  // Show the requested page
+  const page = document.getElementById(pageId);
+  if (page) page.classList.add('active');
+
+  // Set nav active using the provided element if available
+  if (el && el.classList) {
+    el.classList.add('active');
+  } else {
+    // Fallback: try to find matching nav by onclick attribute
+    const nav = document.querySelector(`.nav-item[onclick*="'${pageId}'"]`);
+    nav?.classList.add('active');
+  }
+  
+  const titles = {
+    home: 'Dashboard',
+    farms: 'Farm Management',
+    claims: 'Claims Tracking',
+    weather: 'Weather & Advisory',
+    admin: 'Admin Panel'
+  };
+  document.querySelector('.page-title').textContent = titles[pageId] || 'Dashboard';
+  // Close sidebar on mobile after navigation
+  document.querySelector('.sidebar')?.classList.remove('open');
+
+  // Sync bottom nav active
+  syncBottomNav(pageId);
+}
+
+// Bottom nav active state sync
+function syncBottomNav(target){
+  document.querySelectorAll('.bottom-nav .bn-item').forEach(i => {
+    if (i.getAttribute('data-target') === target) i.classList.add('active');
+    else i.classList.remove('active');
+  });
+}
+
+// Sidebar toggle (mobile)
+function toggleSidebar(){
+  document.querySelector('.sidebar').classList.toggle('open');
+}
+
+// Initialize tabs (Weather / Advisory)
+function initTabs(){
+  document.querySelectorAll('.tabs').forEach(group => {
+    const buttons = group.querySelectorAll('.tab');
+    buttons.forEach(btn => {
+      btn.addEventListener('click', () => {
+        // Activate clicked button
+        buttons.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        // Toggle tab panels
+        const container = group.parentElement; // .card
+        container.querySelectorAll('.tab-content').forEach(p => p.classList.remove('active'));
+        const targetId = btn.getAttribute('data-tab');
+        const panel = container.querySelector('#' + targetId);
+        if (panel) panel.classList.add('active');
+      });
+    });
+  });
+}
+
+// Collapse large sections on small screens
+function adjustCollapsiblesForViewport(){
+  const isMobile = window.innerWidth <= 640;
+  document.querySelectorAll('details.mobile-collapsible').forEach(d => {
+    if (isMobile) d.removeAttribute('open'); else d.setAttribute('open','');
+  });
+}
+
+// Initialize map
+function initMap() {
+  map = L.map('map').setView([20.2961, 85.8245], 12);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap'
+  }).addTo(map);
+
+  fetch(`${API_BASE}/api/farms`)
+    .then(r => r.json())
+    .then(gj => {
+      fieldsLayer = L.geoJSON(gj, {
+        style: { color: '#10b981', weight: 2, fillOpacity: 0.3 },
+        onEachFeature: (f, l) => {
+          l.on('click', () => selectField(f, l));
+          l.bindPopup(`<b>Field ${f.properties.field_id}</b><br>Click for details`);
+        }
+      }).addTo(map);
+    })
+    .catch(e => console.error('Map load error:', e));
+}
+
+// Select field
+function selectField(field, layer) {
+  selectedField = field;
+  selectedLayer = layer;
+  
+  // Highlight
+  if (fieldsLayer) {
+    fieldsLayer.setStyle({ color: '#10b981', weight: 2 });
+  }
+  layer.setStyle({ color: '#ef4444', weight: 3 });
+  
+  // Show field panel (modal/sidebar - simplified here)
+  alert(`Field ${field.properties.field_id}\nArea: ${(Math.random()*5+1).toFixed(1)} ha\nCrop: Rice\nFlood Risk: Analyzing...`);
+  
+  // Auto-run segmentation
+  segmentField(field, layer);
+}
+
+// Run triage
+function runTriage() {
+  fetch(`${API_BASE}/api/triage/run`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ sat_source: 'sentinel', date: '2025-10-26', ndvi_threshold: 0.3 })
+  })
+  .then(r => r.json())
+  .then(j => {
+    alert(`Triage complete!\n${j.hotspots.length} hotspots detected`);
+  })
+  .catch(e => console.error('Triage error:', e));
+}
+
+// Segment field
+function segmentField(field, layer) {
+  const bounds = layer.getBounds();
+  const b = [bounds.getSouth(), bounds.getWest(), bounds.getNorth(), bounds.getEast()];
+  
+  fetch(`${API_BASE}/api/segment/unet`, {
+    method: 'POST',
+    body: (() => {
+      const fd = new FormData();
+      fd.append('bounds', JSON.stringify(b));
+      fd.append('field_id', field.properties.field_id);
+      return fd;
+    })()
+  })
+  .then(r => r.json())
+  .then(j => {
+    const pctField = j.flooded_pct_in_field || j.flooded_pct || 0;
+    
+    // Show result
+    console.log(`Flood detected: ${pctField}%`);
+    
+    // Check claim trigger
+    if (pctField >= 30) {
+      if (confirm(`Flood damage detected: ${pctField}%\n\nEligible for insurance claim. Trigger claim now?`)) {
+        triggerClaim(field.properties.field_id, pctField);
+      }
+    }
+    
+    // Overlay mask
+    if (j.mask_png_base64) {
+      if (maskOverlay) map.removeLayer(maskOverlay);
+      const imgUrl = `data:image/png;base64,${j.mask_png_base64}`;
+      const bb = j.bounds || b;
+      maskOverlay = L.imageOverlay(imgUrl, [[bb[0], bb[1]], [bb[2], bb[3]]], { opacity: 0.6 }).addTo(map);
+    }
+    
+    // Recolor
+    const color = pctField < 20 ? '#10b981' : pctField < 40 ? '#f59e0b' : '#ef4444';
+    layer.setStyle({ fillColor: color, fillOpacity: 0.5 });
+  })
+  .catch(e => console.error('Segmentation error:', e));
+}
+
+// Trigger claim
+function triggerClaim(farmId, floodPct) {
+  const claimId = `C-${Date.now()}`;
+  console.log(`Claim triggered: ${claimId} for Farm ${farmId} (${floodPct}% flood)`);
+  alert(`Claim ${claimId} submitted successfully!\n\nStatus: Pending Review\nFarm: ${farmId}\nFlood Damage: ${floodPct}%`);
+  
+  // Add to claims table
+  const row = `<tr><td>${claimId}</td><td>${farmId}</td><td>-</td><td>${floodPct}%</td><td>94%</td><td><span class="badge badge-warning">Pending</span></td><td><button class="btn btn-sm btn-secondary">Review</button></td></tr>`;
+  document.querySelector('#admin table tbody').insertAdjacentHTML('afterbegin', row);
+}
+
+// GPS Auto-locate
+function gpsAutoLocate() {
+  if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(pos => {
+      const lat = pos.coords.latitude.toFixed(4);
+      const lon = pos.coords.longitude.toFixed(4);
+      document.getElementById('farmLocation').value = `${lat}, ${lon}`;
+      alert(`GPS location acquired:\n${lat}, ${lon}`);
+    }, () => alert('GPS location unavailable'));
+  } else {
+    alert('Geolocation not supported');
+  }
+}
+
+// Submit farm
+function submitFarm(e) {
+  e.preventDefault();
+  const data = {
+    name: document.getElementById('farmerName').value,
+    phone: document.getElementById('farmerPhone').value,
+    location: document.getElementById('farmLocation').value,
+    area: document.getElementById('farmArea').value,
+    crop: document.getElementById('cropType').value,
+    sowing: document.getElementById('sowingDate').value
+  };
+  console.log('Farm submitted:', data);
+  alert('Farm registered successfully!\nFarm ID: F-' + Date.now());
+  document.getElementById('farmForm').reset();
+}
+
+// Layer toggles
+function toggleLayer(layerId) {
+  const toggle = event.target.closest('.layer-toggle').querySelector('.toggle-switch');
+  toggle.classList.toggle('active');
+  console.log(`${layerId} layer toggled`);
+}
+
+// Refresh data
+function refreshData() {
+  console.log('Refreshing data...');
+  location.reload();
+}
+
+// Charts
+function initCharts() {
+  // Flood trend chart
+  const ctx1 = document.getElementById('floodChart');
+  if (ctx1) {
+    new Chart(ctx1.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Oct 20', 'Oct 21', 'Oct 22', 'Oct 23', 'Oct 24', 'Oct 25', 'Oct 26'],
+        datasets: [{
+          label: 'Flood Affected %',
+          data: [12, 15, 18, 22, 19, 21, 23],
+          borderColor: '#ef4444',
+          backgroundColor: 'rgba(239, 68, 68, 0.1)',
+          tension: 0.4
+        }]
+      },
+      options: { 
+        responsive: true, 
+        maintainAspectRatio: false,
+        layout: { padding: 8 },
+        scales: {
+          x: { ticks: { maxTicksLimit: 7, autoSkip: true, maxRotation: 0, minRotation: 0 } },
+          y: { beginAtZero: true, suggestedMax: 100, ticks: { stepSize: 20 } }
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  // Claim status doughnut
+  const claimEl = document.getElementById('claimChart');
+  if (claimEl) {
+    new Chart(claimEl.getContext('2d'), {
+      type: 'doughnut',
+      data: {
+        labels: ['Pending', 'Verified', 'Rejected'],
+        datasets: [{
+          data: [18, 24, 5],
+          backgroundColor: ['#f59e0b', '#10b981', '#ef4444'],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        cutout: '62%', plugins: { legend: { position: 'bottom' } }
+      }
+    });
+  }
+
+  // Model performance chart
+  const perfEl = document.getElementById('performanceChart');
+  if (perfEl) {
+    new Chart(perfEl.getContext('2d'), {
+      type: 'line',
+      data: {
+        labels: ['Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+        datasets: [{
+          label: 'IoU %',
+          data: [88, 90, 91, 92, 94],
+          borderColor: '#10b981',
+          backgroundColor: 'rgba(16,185,129,0.12)',
+          fill: true, tension: 0.35
+        }]
+      },
+      options: {
+        responsive: true, maintainAspectRatio: false,
+        layout: { padding: 8 },
+        scales: { 
+          x: { ticks: { maxTicksLimit: 6, autoSkip: true, maxRotation: 0, minRotation: 0 } },
+          y: { beginAtZero: false, suggestedMin: 80, suggestedMax: 100 } 
+        },
+        plugins: { legend: { display: false } }
+      }
+    });
+  }
+
+  // Rainfall chart
+  const ctx2 = document.getElementById('rainfallChart');
+  if (ctx2) {
+    new Chart(ctx2.getContext('2d'), {
+      type: 'bar',
+      data: {
+        labels: ['Today', 'Day 2', 'Day 3', 'Day 4', 'Day 5', 'Day 6', 'Day 7'],
+        datasets: [{
+          label: 'Rainfall (mm)',
+          data: [95, 110, 20, 5, 8, 15, 30],
+          backgroundColor: '#3b82f6'
+        }]
+      },
+      options: { responsive: true, maintainAspectRatio: false,
+        layout: { padding: 8 },
+        scales: { 
+          x: { ticks: { maxTicksLimit: 7, autoSkip: true, maxRotation: 0, minRotation: 0 } },
+          y: { beginAtZero: true } 
+        }, plugins: { legend: { display: false } } }
+    });
+  }
+}
+
+// Init on load
+window.addEventListener('load', async () => {
+  await checkAuth();
+  initMap();
+  initCharts();
+  initTabs();
+  loadWeather();
+  adjustCollapsiblesForViewport();
+});
+
+// Update collapsibles on resize
+let __resizeTO;
+window.addEventListener('resize', () => {
+  clearTimeout(__resizeTO);
+  __resizeTO = setTimeout(adjustCollapsiblesForViewport, 150);
+});
+
+// Check authentication with Clerk
+async function checkAuth() {
+  try {
+    const clerk = window.Clerk;
+    await clerk.load();
+    
+    if (!clerk.user) {
+      // User is not signed in, redirect to login
+      const api = new URLSearchParams(window.location.search).get('api');
+      window.location.href = 'login.html' + (api ? `?api=${encodeURIComponent(api)}` : '');
+      return;
+    }
+    
+    // Update user info in sidebar with Clerk data
+    const user = clerk.user;
+    const fullName = `${user.firstName || ''} ${user.lastName || ''}`.trim() || 'User';
+    const email = user.primaryEmailAddress?.emailAddress || '';
+    
+    document.querySelector('.user-info div:nth-child(2) div:first-child').textContent = fullName;
+    document.querySelector('.user-info div:nth-child(2) div:last-child').textContent = email;
+    document.querySelector('.avatar').textContent = (user.firstName?.[0] || '') + (user.lastName?.[0] || 'U');
+    
+  } catch (error) {
+    console.error('Auth error:', error);
+    const api = new URLSearchParams(window.location.search).get('api');
+    window.location.href = 'login.html' + (api ? `?api=${encodeURIComponent(api)}` : '');
+  }
+}
+
+// Logout function
+async function logout() {
+  try {
+    const clerk = window.Clerk;
+    await clerk.signOut();
+    const api = new URLSearchParams(window.location.search).get('api');
+    window.location.href = 'login.html' + (api ? `?api=${encodeURIComponent(api)}` : '');
+  } catch (error) {
+    console.error('Logout error:', error);
+  }
+}
+
+// Load weather data
+async function loadWeather() {
+  try {
+    // Load current weather
+    const currentRes = await fetch(`${API_BASE}/api/weather/current`);
+    const currentData = await currentRes.json();
+    displayCurrentWeather(currentData);
+    
+    // Update home page weather stat card
+    updateHomeWeatherStat(currentData);
+    
+    // Load forecast
+    const forecastRes = await fetch(`${API_BASE}/api/weather/forecast`);
+    const forecastData = await forecastRes.json();
+    displayForecast(forecastData);
+    
+    // Load alerts
+    const alertsRes = await fetch(`${API_BASE}/api/weather/alerts`);
+    const alertsData = await alertsRes.json();
+    displayAlerts(alertsData);
+    
+  } catch (e) {
+    console.error('Weather load error:', e);
+    
+    // Update home weather card with fallback
+    const tempEl = document.getElementById('currentTemp');
+    const descEl = document.getElementById('currentDesc');
+    if (tempEl) tempEl.textContent = '--°C';
+    if (descEl) descEl.textContent = 'Unavailable';
+    
+    // Graceful fallbacks so the page is never empty
+    const current = document.getElementById('currentWeather');
+    if (current) {
+      current.innerHTML = `
+        <div style="padding:20px; background:var(--bg); border-radius:12px; grid-column:1 / -1; text-align:center;">
+          <div style="font-weight:600;">Weather data is currently unavailable</div>
+          <div style="font-size:12px; opacity:0.8; margin-top:4px;">Check your backend (/api/weather/*) or try again later.</div>
+        </div>`;
+    }
+    const grid = document.getElementById('weatherGrid');
+    if (grid) {
+      grid.innerHTML = `
+        <div class="weather-card" style="background:linear-gradient(135deg,#0f5538,#10b981);">
+          <p style="font-weight:600;">Today</p>
+          <h3>--</h3>
+          <p>No forecast</p>
+          <p>0mm (0%)</p>
+          <p style="font-size:12px; opacity:0.9;">0.0 m/s</p>
+        </div>`;
+    }
+    const alerts = document.getElementById('weatherAlerts');
+    if (alerts) {
+      alerts.innerHTML = `
+        <div class="alert alert-info" style="display:flex; align-items:center; gap:8px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+          <strong>Advisory:</strong> Unable to fetch live alerts. General advice: avoid waterlogging; check field bunds.
+        </div>`;
+    }
+  }
+}
+
+// Update home page weather stat card
+function updateHomeWeatherStat(data) {
+  const tempEl = document.getElementById('currentTemp');
+  const descEl = document.getElementById('currentDesc');
+  if (tempEl) tempEl.textContent = `${Math.round(data.temp)}°C`;
+  if (descEl) {
+    const desc = data.description || 'Clear';
+    descEl.textContent = desc.charAt(0).toUpperCase() + desc.slice(1);
+  }
+}
+
+// Display current weather
+function displayCurrentWeather(data) {
+  const container = document.getElementById('currentWeather');
+  if (!container) return;
+  
+  const icon = getWeatherIconSVG(data.icon, 48);
+  container.innerHTML = `
+    <div style="text-align:center; padding:20px; background:linear-gradient(135deg, #667eea 0%, #764ba2 100%); border-radius:12px; color:#fff;">
+      <div style="font-size:48px; margin-bottom:8px; line-height:0;">${icon}</div>
+      <div style="font-size:32px; font-weight:700;">${Math.round(data.temp)}°C</div>
+      <div style="opacity:0.9; margin-top:4px;">${data.description}</div>
+    </div>
+    <div style="padding:20px; background:var(--bg); border-radius:12px;">
+      <div style="margin-bottom:8px;"><strong>Feels Like:</strong> ${Math.round(data.feels_like)}°C</div>
+      <div style="margin-bottom:8px;"><strong>Humidity:</strong> ${data.humidity}%</div>
+      <div><strong>Wind:</strong> ${data.wind_speed} m/s</div>
+    </div>
+    <div style="padding:20px; background:var(--bg); border-radius:12px;">
+      <div style="margin-bottom:8px;"><strong>Pressure:</strong> ${data.pressure} hPa</div>
+      <div style="margin-bottom:8px;"><strong>UV Index:</strong> ${data.uvi || 'N/A'}</div>
+      <div><strong>Visibility:</strong> ${(data.visibility/1000).toFixed(1)} km</div>
+    </div>
+    <div style="padding:20px; background:var(--bg); border-radius:12px; display:flex; align-items:center; justify-content:center;">
+      <div style="text-align:center;">
+        <div style="font-size:13px; color:var(--text-muted); margin-bottom:4px;">Last Updated</div>
+        <div style="font-weight:600;">${new Date().toLocaleTimeString()}</div>
+      </div>
+    </div>
+  `;
+}
+
+// Display forecast
+function displayForecast(data) {
+  const grid = document.getElementById('weatherGrid');
+  if (!grid) return;
+  
+  grid.innerHTML = '';
+  
+  const gradients = [
+    'linear-gradient(135deg, #0a3d2c 0%, #0f5538 100%)',
+    'linear-gradient(135deg, #0f5538 0%, #10b981 100%)',
+    'linear-gradient(135deg, #10b981 0%, #34d399 100%)',
+    'linear-gradient(135deg, #34d399 0%, #6ee7b7 100%)',
+    'linear-gradient(135deg, #10b981 0%, #6ee7b7 100%)',
+    'linear-gradient(135deg, #0f5538 0%, #34d399 100%)',
+    'linear-gradient(135deg, #0a3d2c 0%, #10b981 100%)'
+  ];
+  
+  data.daily.forEach((day, idx) => {
+  const icon = getWeatherIconSVG(day.icon, 48);
+    const popPercent = Math.round((day.pop || 0) * 100);
+    const card = `
+      <div class="weather-card" style="background:${gradients[idx]}; box-shadow:0 8px 24px rgba(16, 185, 129, 0.3);">
+        <p style="font-weight:600; text-shadow:0 2px 4px rgba(0,0,0,0.2);">${idx === 0 ? 'Today' : day.date}</p>
+  <h3 style="filter:drop-shadow(0 2px 4px rgba(0,0,0,0.2)); line-height:0;">${icon}</h3>
+        <p style="font-size:16px; font-weight:600; margin:8px 0; text-shadow:0 2px 4px rgba(0,0,0,0.2);">${Math.round(day.temp_max)}° / ${Math.round(day.temp_min)}°</p>
+        <p style="text-shadow:0 1px 2px rgba(0,0,0,0.1);">${day.desc}</p>
+        <p style="margin-top:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; gap:6px;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" style="opacity:0.9;">
+            <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/>
+          </svg>
+          ${Math.round(day.rainfall)}mm (${popPercent}%)
+        </p>
+        <p style="font-size:12px; opacity:0.9; margin-top:4px; text-shadow:0 1px 2px rgba(0,0,0,0.1); display:flex; align-items:center; justify-content:center; gap:4px;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/>
+          </svg>
+          ${day.wind_speed.toFixed(1)} m/s
+        </p>
+      </div>
+    `;
+    grid.innerHTML += card;
+  });
+}
+
+// Display alerts
+function displayAlerts(data) {
+  const container = document.getElementById('weatherAlerts');
+  if (!container) return;
+  
+  container.innerHTML = '';
+  
+  if (data.alerts && data.alerts.length > 0) {
+    data.alerts.forEach(alert => {
+      const alertType = alert.tags && alert.tags.includes('Flood') ? 'danger' : 'warning';
+      const alertHtml = `
+        <div class="alert alert-${alertType}">
+          <div>
+            <strong>${alert.event}</strong><br>
+            <span style="font-size:12px; opacity:0.8;">Source: ${alert.sender_name}</span>
+            <div style="margin-top:8px;">${alert.description}</div>
+            <div style="margin-top:8px; font-size:12px; opacity:0.8;">
+              Valid: ${new Date(alert.start * 1000).toLocaleString()} - ${new Date(alert.end * 1000).toLocaleString()}
+            </div>
+          </div>
+        </div>
+      `;
+      container.innerHTML += alertHtml;
+    });
+  } else {
+    container.innerHTML = `
+      <div class="alert alert-info" style="display:flex; align-items:center; gap:8px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <strong>No Active Alerts:</strong> Weather conditions are normal. Continue monitoring for updates.
+      </div>
+    `;
+  }
+}
+
+// Weather icon mapping
+function getWeatherIconSVG(iconCode, size=48) {
+  const common = `width="${size}" height="${size}" viewBox="0 0 24 24"`;
+  const sun = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>`;
+  const moon = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+  const cloud = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10a4 4 0 0 0-7.9-1H9a5 5 0 0 0 0 10h9a4 4 0 0 0 0-8z"/></svg>`;
+  const cloudSun = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="4" cy="4" r="2"/><path d="M13 12a5 5 0 0 0-9.9 1H3a6 6 0 0 0 0 12h10a5 5 0 0 0 0-10z"/></svg>`;
+  const rain = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 16.58A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 2-3.42z"/><line x1="8" y1="19" x2="8" y2="21"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="16" y1="19" x2="16" y2="22"/></svg>`;
+  const storm = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 16l-3 5h2l-2 4 6-7h-3l2-4z"/><path d="M20 16.58A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 2-3.42z"/></svg>`;
+  const snow = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="2" x2="12" y2="22"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/><line x1="19.07" y1="4.93" x2="4.93" y2="19.07"/></svg>`;
+  const mist = `<svg ${common} fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12h18M3 16h18M3 8h18"/></svg>`;
+  const map = {
+    '01d': sun, '01n': moon,
+    '02d': cloudSun, '02n': cloud,
+    '03d': cloud, '03n': cloud,
+    '04d': cloud, '04n': cloud,
+    '09d': rain, '09n': rain,
+    '10d': rain, '10n': rain,
+    '11d': storm, '11n': storm,
+    '13d': snow, '13n': snow,
+    '50d': mist, '50n': mist
+  };
+  return map[iconCode] || cloudSun;
+}
+
+// Download PDF
+async function downloadPDF(claimId) {
+  try {
+    const res = await fetch(`${API_BASE}/api/claim/${claimId}/pdf`);
+    const data = await res.json();
+    
+    // Convert base64 to blob
+    const byteCharacters = atob(data.pdf_base64);
+    const byteNumbers = new Array(byteCharacters.length);
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i);
+    }
+    const byteArray = new Uint8Array(byteNumbers);
+    const blob = new Blob([byteArray], { type: 'application/pdf' });
+    
+    // Create download link
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = data.filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+    
+  alert('PDF downloaded successfully!');
+  } catch (e) {
+    console.error('PDF download error:', e);
+  alert('Failed to download PDF');
+  }
+}
+
+</script>
+</body>
+</html>

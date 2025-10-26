@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vani — AI-Powered Flood Insurance</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <style>
+        :root{
+            --dark-forest:#0a3d2c; --deep-green:#0f5538; --emerald:#10b981;
+            --mint:#34d399; --sage:#6ee7b7;
+            --text:#e6f4ef; --text-muted:#b7d3ca; --bg:#0b0f17; --bg-2:#0e1622;
+            --font-heading:'Playfair Display', Georgia, serif;
+            --font-body:'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            --phi:1.618; --container-max:1280px;
+        }
+        *{box-sizing:border-box}
+        html,body{height:100%; margin:0; font-family:var(--font-body); background:var(--bg); color:var(--text);}
+
+        /* Global radial + vignette like the reference */
+        body::before{
+            content:''; position:fixed; inset:0; z-index:-1;
+            background:
+                radial-gradient(1200px 600px at 50% 75%, rgba(16,185,129,0.20) 0%, rgba(16,185,129,0.10) 35%, rgba(0,0,0,0) 65%),
+                radial-gradient(800px 400px at 20% 0%, rgba(16,185,129,0.10) 0%, rgba(0,0,0,0) 60%),
+                radial-gradient(800px 400px at 80% 0%, rgba(16,185,129,0.10) 0%, rgba(0,0,0,0) 60%),
+                radial-gradient(ellipse at bottom center, #0f5538 0%, #0a3d2c 40%, #070b12 75%, #05070b 100%);
+            filter: saturate(105%);
+        }
+
+    .container{ max-width:var(--container-max); margin:0 auto; padding:24px; }
+
+        /* Navbar */
+                .nav{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; position:relative; }
+        .brand{ display:flex; align-items:center; gap:12px; font-family:var(--font-heading); font-weight:800; font-size:22px; letter-spacing:-0.5px; }
+                .brand .logo{ width:36px; height:36px; border-radius:10px; display:grid; place-items:center; overflow:hidden;
+            background:linear-gradient(135deg, rgba(16,185,129,0.25), rgba(52,211,153,0.2)); box-shadow:0 8px 24px rgba(16,185,129,.18) inset 0 1px 0 rgba(255,255,255,.15); }
+                .nav-links{ display:flex; align-items:center; gap:22px; color:var(--text-muted); font-weight:600; }
+        .nav-links a{ color:inherit; text-decoration:none; transition:color .2s; }
+        .nav-links a:hover{ color:#eafaf4; }
+        .login-btn{ padding:10px 16px; border:1px solid rgba(255,255,255,0.15); border-radius:10px; color:#eafaf4; text-decoration:none; }
+                .nav-toggle{ display:none; background:transparent; border:1px solid rgba(255,255,255,.16); color:#eafaf4; border-radius:10px; padding:8px; }
+                @media (max-width: 720px){
+                    .nav-links{ position:absolute; right:24px; top:56px; background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:12px; gap:12px; display:none; flex-direction:column; min-width:160px; }
+                    .nav-links.open{ display:flex }
+                    .nav-toggle{ display:inline-flex }
+                    .brand{ font-size:20px }
+                    .brand .logo{ width:32px; height:32px }
+                }
+
+        /* Hero */
+                .hero{ padding:80px 0 56px; text-align:center; }
+                .hero h1{ 
+                    font-family: 'Poppins', sans-serif;
+                    font-weight: 800;
+                    letter-spacing: -0.03em;
+                    font-size:56px; line-height:1.12; margin:20px auto 14px; 
+                    max-width:calc(var(--container-max) / var(--phi));
+                    background: linear-gradient(180deg, #ffffff 0%, #e8e8e8 50%, #b8b8b8 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+                .hero p{ 
+                    color:var(--text-muted); font-size:18px; line-height:1.55; 
+                    max-width:calc(var(--container-max) / var(--phi)); margin:0 auto 28px;
+                    background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
+                    background-clip: text;
+                }
+                @media (max-width: 720px){
+                    .hero{ padding:48px 0 40px }
+                    .hero h1{ font-size:36px; line-height:1.18; max-width:94vw; margin:16px auto 12px }
+                    .hero p{ font-size:16px; line-height:1.5; max-width:94vw; margin:0 auto 20px }
+                }
+                @media (max-width: 500px){
+                    .hero h1{ font-size:30px; line-height:1.2 }
+                    .hero p{ font-size:15px }
+                }
+
+        .cta{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; }
+        .btn{ display:inline-flex; align-items:center; gap:10px; padding:13px 20px; border-radius:12px; font-weight:700; text-decoration:none; transition:transform .15s ease, box-shadow .2s ease; font-size:15px; }
+        .btn-primary{ color:#062a1f; background:linear-gradient(135deg, #34d399, #10b981); box-shadow:0 10px 30px rgba(16,185,129,.35); }
+        .btn-primary:hover{ transform:translateY(-1px); box-shadow:0 16px 40px rgba(16,185,129,.45); }
+        .btn-ghost{ color:#eafaf4; border:1px solid rgba(255,255,255,.16); }
+        @media (max-width: 500px){
+            .cta{ gap:10px }
+            .btn{ padding:11px 18px; font-size:14px }
+        }
+
+        /* Mock dashboard area */
+                .hero-visual{ margin:48px auto 0; width:min(calc(var(--container-max) / var(--phi)), 94vw); aspect-ratio: 16/9; position:relative; }
+                .hero-visual::before{ content:''; position:absolute; inset:-28px -32px 24px; border-radius:24px; background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); filter:blur(0.3px); border:1px solid rgba(255,255,255,0.06); z-index:1; }
+                    /* Copilot-like neon glow around the mockup (purple/blue/cyan) */
+                    .neon-ring{ position:absolute; inset:-6%; border-radius:28px; z-index:0; pointer-events:none;
+                        background: conic-gradient(from 0deg, rgba(99,102,241,.40), rgba(34,211,238,.50), rgba(56,189,248,.40), rgba(167,139,250,.45), rgba(99,102,241,.40));
+                        filter: blur(28px) saturate(150%);
+                        animation: hueSweep 20s linear infinite;
+                        opacity:.9;
+                    }
+                    /* Bright animated band hugging the top edge of the frame */
+                    .neon-edge{ position:absolute; left:3.5%; right:3.5%; top:-16px; height:30px; z-index:0; pointer-events:none;
+                        background: linear-gradient(90deg, #22d3ee 0%, #60a5fa 33%, #a78bfa 66%, #22d3ee 100%);
+                        background-size: 220% 100%; filter: blur(16px) saturate(160%); opacity:.98;
+                        animation: edgeRun 7s ease-in-out infinite;
+                    }
+                    /* Soft horizontal halo rising from the frame */
+                    .neon-halo{ position:absolute; left:-6%; right:-6%; bottom:52%; height:220px; z-index:0; pointer-events:none;
+                        background: radial-gradient(120% 160% at 50% 100%, rgba(56,189,248,.55) 0%, rgba(167,139,250,.50) 35%, rgba(34,211,238,.35) 55%, rgba(0,0,0,0) 72%);
+                        filter: blur(36px) saturate(140%); opacity:.9;
+                        animation: floatUp 10s ease-in-out infinite alternate;
+                    }
+                    @keyframes hueSweep { to { filter: blur(28px) saturate(150%) hue-rotate(360deg); } }
+                    @keyframes floatUp { 0%{ transform:translateY(0)} 100%{ transform:translateY(-8px)} }
+                @keyframes edgeRun { 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+                    /* Mockup frame with animated gradient border glow */
+                    .mockup{ position:relative; z-index:2; width:100%; height:100%; border-radius:18px; padding:2px; }
+                    .mockup::before{ content:''; position:absolute; inset:-6px; border-radius:22px;
+                        background: linear-gradient(120deg, rgba(34,211,238,.55), rgba(96,165,250,.55), rgba(167,139,250,.55), rgba(34,211,238,.55));
+                        background-size: 300% 100%; filter: blur(14px); opacity:.85; z-index:-1; animation: edgeRun 8s ease-in-out infinite;
+                    }
+                                        .placeholder{
+                        position:relative; width:100%; height:100%; 
+                        background: url('dashboard-preview.png') center/cover no-repeat;
+                        background-size: cover;
+                        border-radius:16px; 
+                        box-shadow:0 12px 60px rgba(0,0,0,.55), 0 0 0 1px rgba(255,255,255,.06) inset;
+                        overflow:hidden;
+                    }
+                .note{ color:#334155; position:absolute; bottom:10px; right:12px; font-size:12px; background:rgba(255,255,255,.85); padding:6px 10px; border-radius:999px; }
+                @media (max-width: 720px){
+                    .hero-visual{ width:94vw; aspect-ratio: 16/10; margin:36px auto 0 }
+                    .neon-ring{ inset:-5%; border-radius:22px }
+                    .neon-edge{ height:24px; filter:blur(12px) saturate(150%) }
+                    .neon-halo{ height:180px; filter:blur(28px) saturate(130%) }
+                    .mockup{ border-radius:14px }
+                    .mockup::before{ inset:-4px; border-radius:18px; filter:blur(10px) }
+                    .placeholder{ border-radius:12px }
+                    .note{ font-size:11px; padding:5px 8px }
+                }
+                @media (max-width: 500px){
+                    .hero-visual{ width:96vw; aspect-ratio:4/3; margin:28px auto 0 }
+                    .hero-visual::before{ inset:-18px -20px 16px; border-radius:18px }
+                    .neon-ring{ inset:-4%; border-radius:18px; filter:blur(22px) saturate(140%) }
+                    .neon-edge{ top:-12px; height:20px; filter:blur(10px) saturate(140%) }
+                    .neon-halo{ height:140px; filter:blur(24px) saturate(120%) }
+                    .note{ bottom:8px; right:8px; font-size:10px; padding:4px 8px }
+                }
+
+        /* Trusted logos row (optional placeholder) */
+        .trusted{ opacity:.85; display:flex; gap:28px; justify-content:center; align-items:center; margin:18px 0 0; filter:saturate(.8); }
+        .trusted span{ color:var(--text-muted); font-weight:600; font-size:13px; letter-spacing:.2px; }
+
+        @media (max-width: 768px){
+            .hero h1{ font-size:34px; }
+            .nav-links{ display:none; }
+        }
+    </style>
+</head>
+<body>
+    <header class="container nav">
+        <div class="brand">
+            <div class="logo">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M3 12c3.5-2.5 7.5-2.5 11 0s7.5 2.5 11 0" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M3 16c3.5-2.5 7.5-2.5 11 0s7.5 2.5 11 0" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </div>
+            Vani
+        </div>
+                        <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Open menu">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                        </button>
+                        <nav class="nav-links">
+                <a href="#">Home</a>
+                <a href="#features">Features</a>
+                <a class="login-btn" href="/frontend_static/login.html">Log in</a>
+            </nav>
+    </header>
+
+    <main class="container hero">
+            <h1>AI flood intelligence for crops<br/>and lightning‑fast insurance claims</h1>
+            <p>Monitor farms in real time, detect floods from satellite imagery, and automate claim assessment with accurate, explainable insights.</p>
+        <div class="cta">
+                <a class="btn btn-primary" href="/frontend_static/login.html">Sign in</a>
+                <a class="btn btn-ghost" href="#features">See features</a>
+        </div>
+
+                    <div class="hero-visual">
+                        <div class="neon-ring" aria-hidden="true"></div>
+                        <div class="neon-edge" aria-hidden="true"></div>
+                        <div class="neon-halo" aria-hidden="true"></div>
+                        <div class="mockup">
+                            <div class="placeholder" role="img" aria-label="Dashboard mockup placeholder"></div>
+                        </div>
+                        <div class="note">placeholder — your dashboard mockup goes here</div>
+                    </div>
+
+    
+    </main>
+  
+        <!-- Features Section -->
+        <section id="features" class="container" style="padding:64px 24px 88px;">
+            <h2 style="font-family:var(--font-heading); font-size:38px; margin:0 auto 18px; letter-spacing:-0.5px; max-width:calc(var(--container-max) / var(--phi)); text-align:center;">What Vani can do</h2>
+            <p style="color:var(--text-muted); margin:0 auto 36px; max-width:calc(var(--container-max) / var(--phi)); text-align:center; font-size:16px; line-height:1.5;">Everything you need to run flood‑related crop insurance—end to end.</p>
+            <div style="display:grid; grid-template-columns:repeat( auto-fit, minmax(280px, 1fr) ); gap:20px; align-items:stretch; max-width:var(--container-max); margin:0 auto;">
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12c3.5-2.5 7.5-2.5 11 0s7.5 2.5 11 0" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Satellite flood detection
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Process Sentinel imagery to spot flooded areas with clear overlays and confidence scores.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M21 10V21H3V3h11" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Farm map & monitoring
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Interactive map of all farms, boundaries, and flood severity—updated as new scenes arrive.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8 17l4 4 4-4M12 3v18" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Automated claim triage
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Prioritize claims by impact, generate evidence packs, and reduce manual review time.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 7h18M3 12h18M3 17h18" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Branded PDF reports
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Export professional reports with maps, charts, and model outputs—ready to share.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M3 12a9 9 0 1018 0 9 9 0 10-18 0zm9-5v5l3 3" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Weather & risk insights
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Forecasts and risk signals to act early and keep farmers protected.</p>
+                </div>
+                <div style="background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.06); border-radius:14px; padding:24px;">
+                    <div style="display:flex; align-items:center; gap:10px; font-weight:700; margin-bottom:10px;"> 
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 1l3 7h7l-5.5 4.5L18 21l-6-4-6 4 1.5-8.5L2 8h7l3-7z" stroke="#10b981" stroke-width="2" stroke-linecap="round"/></svg>
+                        Secure sign‑in (Clerk)
+                    </div>
+                    <p style="color:var(--text-muted); margin:0; font-size:15px; line-height:1.5;">Reliable authentication with redirect to your dashboard after sign‑in.</p>
+                </div>
+            </div>
+        </section>
+</body>
+</html>

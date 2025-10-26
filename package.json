@@ -1,0 +1,21 @@
+{
+  "name": "vani-flood-insurance",
+  "version": "1.0.0",
+  "description": "AI-powered flood detection and crop insurance platform",
+  "scripts": {
+    "dev": "python -m http.server 8080 --directory frontend_static",
+    "build": "echo 'Static site - no build needed'",
+    "deploy": "netlify deploy --prod"
+  },
+  "keywords": [
+    "flood-detection",
+    "crop-insurance",
+    "ai",
+    "satellite-imagery"
+  ],
+  "author": "Vani Team",
+  "license": "MIT",
+  "devDependencies": {
+    "netlify-cli": "^17.0.0"
+  }
+}

@@ -1,0 +1,1 @@
+{"cont_cols": ["ndvi_mean", "ndvi_std", "evi_mean", "avg_temp_c", "rainfall_mm", "plant_density_plants_m2", "fertilizer_kg_ha", "irrigation_mm", "elevation_m", "slope_pct", "prior_yield_qha", "sowing_doy"], "cat_col": "soil_type", "soil_vocab": ["clay", "loam", "sandy"]}

@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vani - Sign In</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700;800&family=Roboto:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --dark-forest:#0a3d2c; --deep-green:#0f5538; --emerald:#10b981;
+  --mint:#34d399; --sage:#6ee7b7; --light-mint:#d1fae5;
+  --bg:#f8fdfb; --card:#ffffff; --border:#e5f3ee; --text:#0a3d2c;
+  --text-muted:#0f5538; --shadow:rgba(10, 61, 44, 0.15);
+  --font-heading:'Playfair Display', Georgia, serif;
+  --font-body:'Roboto', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+*{margin:0; padding:0; box-sizing:border-box;}
+body{
+  font-family:var(--font-body);
+  background:#000000;
+  min-height:100vh; display:flex; align-items:center; justify-content:center;
+  padding:40px 20px; position:relative; overflow-y:auto;
+}
+
+body::before{
+  content:''; position:absolute; top:0; left:0; right:0; bottom:0;
+  background:
+    radial-gradient(ellipse at bottom center, #0f5538 0%, #0a3d2c 40%, #000000 80%),
+    radial-gradient(circle at top left, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at top right, rgba(16, 185, 129, 0.15) 0%, transparent 40%),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at bottom right, rgba(16, 185, 129, 0.1) 0%, transparent 50%);
+  pointer-events:none; z-index:0;
+}
+
+.login-container{
+  background:rgba(255,255,255,0.98); border-radius:24px; 
+  box-shadow:0 24px 64px rgba(10, 61, 44, 0.5), 0 0 0 1px rgba(16, 185, 129, 0.2);
+  width:100%; max-width:480px; overflow:visible;
+  animation:slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); position:relative; z-index:1;
+  margin:auto;
+}
+
+@keyframes slideUp{
+  from{opacity:0; transform:translateY(30px) scale(0.95);}
+  to{opacity:1; transform:translateY(0) scale(1);}
+}
+
+.login-header{
+  background:linear-gradient(180deg, #0a3d2c 0%, #0f5538 50%, #10b981 100%);
+  padding:48px 40px 40px; text-align:center; color:#fff; position:relative; overflow:hidden;
+}
+.login-header::before{
+  content:''; position:absolute; top:0; right:0; width:200px; height:200px;
+  background:radial-gradient(circle, rgba(52, 211, 153, 0.2) 0%, transparent 70%);
+  animation:float 6s infinite ease-in-out;
+}
+.login-header::after{
+  content:''; position:absolute; bottom:0; left:0; width:150px; height:150px;
+  background:radial-gradient(circle, rgba(16, 185, 129, 0.15) 0%, transparent 70%);
+  animation:float 8s infinite ease-in-out reverse;
+}
+@keyframes float{
+  0%, 100%{transform:translate(0, 0);}
+  50%{transform:translate(-20px, 20px);}
+}
+.logo{font-size:64px; margin-bottom:16px; position:relative; z-index:1; 
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));}
+.app-name{font-size:36px; font-weight:700; margin-bottom:10px; position:relative; z-index:1;
+          letter-spacing:-0.5px; font-family:var(--font-heading);}
+.tagline{font-size:15px; opacity:0.9; position:relative; z-index:1; font-weight:400; font-family:var(--font-body);}
+.logo{font-size:56px; margin-bottom:12px; position:relative; z-index:1; 
+      filter:drop-shadow(0 4px 12px rgba(0,0,0,0.3));}
+.app-name{font-size:32px; font-weight:700; margin-bottom:8px; position:relative; z-index:1;
+          letter-spacing:-0.5px;}
+.tagline{font-size:15px; opacity:0.9; position:relative; z-index:1; font-weight:400;}
+
+.login-body{padding:48px 40px;}
+
+.clerk-container{
+  min-height: 420px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-message{
+  padding:16px 20px; 
+  background:linear-gradient(135deg, rgba(239, 68, 68, 0.05), rgba(220, 38, 38, 0.05));
+  border:1px solid #fecaca;
+  border-radius:12px; color:#991b1b; font-size:14px; margin-bottom:20px;
+  text-align: center;
+}
+
+.welcome-text{
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.welcome-text h2{
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+  color:var(--dark-forest);
+  letter-spacing:-0.5px;
+  font-family:var(--font-heading);
+}
+
+.welcome-text p{
+  font-size: 15px;
+  color: var(--text-muted);
+  font-weight:400;
+  font-family:var(--font-body);
+}
+
+@media(max-width:500px){
+  body{padding:20px 12px;}
+  .login-container{border-radius:20px; margin:0;}
+  .login-body{padding:32px 24px;}
+  .login-header{padding:36px 24px 28px;}
+  .app-name{font-size:30px}
+  .logo{font-size:52px; margin-bottom:10px;}
+  .tagline{font-size:14px;}
+  .welcome-text h2{font-size:22px;}
+  .welcome-text p{font-size:14px;}
+  .clerk-container{min-height:380px;}
+}
+</style>
+</head>
+<body>
+<div class="login-container">
+  <div class="login-header">
+    <div class="logo">
+      <svg width="64" height="64" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 42C8 42 12 38 16 38C20 38 20 42 24 42C28 42 28 38 32 38C36 38 36 42 40 42C44 42 44 38 48 38C52 38 56 42 56 42V54C56 55.1046 55.1046 56 54 56H10C8.89543 56 8 55.1046 8 54V42Z" fill="white" opacity="0.3"/>
+        <path d="M8 32C8 32 12 28 16 28C20 28 20 32 24 32C28 32 28 28 32 28C36 28 36 32 40 32C44 32 44 28 48 28C52 28 56 32 56 32V42C56 42 52 38 48 38C44 38 44 42 40 42C36 42 36 38 32 38C28 38 28 42 24 42C20 42 20 38 16 38C12 38 8 42 8 42V32Z" fill="white" opacity="0.5"/>
+        <path d="M8 22C8 22 12 18 16 18C20 18 20 22 24 22C28 22 28 18 32 18C36 18 36 22 40 22C44 22 44 18 48 18C52 18 56 22 56 22V32C56 32 52 28 48 28C44 28 44 32 40 32C36 32 36 28 32 28C28 28 28 32 24 32C20 32 20 28 16 28C12 28 8 32 8 32V22Z" fill="white" opacity="0.7"/>
+        <path d="M8 12C8 12 12 8 16 8C20 8 20 12 24 12C28 12 28 8 32 8C36 8 36 12 40 12C44 12 44 8 48 8C52 8 56 12 56 12V22C56 22 52 18 48 18C44 18 44 22 40 22C36 22 36 18 32 18C28 18 28 22 24 22C20 22 20 18 16 18C12 18 8 22 8 22V12Z" fill="white"/>
+        <circle cx="20" cy="48" r="2" fill="white"/>
+        <circle cx="32" cy="50" r="1.5" fill="white" opacity="0.8"/>
+        <circle cx="44" cy="48" r="2" fill="white" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="app-name">Vani</div>
+    <div class="tagline">AI-Powered Flood Insurance Management</div>
+  </div>
+  
+  <div class="login-body">
+    <div class="welcome-text">
+      <h2>Welcome to Vani</h2>
+      <p>Sign in to access your flood insurance dashboard</p>
+    </div>
+
+    <div class="clerk-container" id="clerkSignIn">
+      <!-- Clerk sign-in form will load here -->
+    </div>
+
+    <div id="errorContainer"></div>
+  </div>
+</div>
+
+<script
+  async
+  crossorigin="anonymous"
+  data-clerk-publishable-key="pk_test_bWVycnktbW9sbHVzay03NS5jbGVyay5hY2NvdW50cy5kZXYk"
+  src="https://merry-mollusk-75.clerk.accounts.dev/npm/@clerk/clerk-js@latest/dist/clerk.browser.js"
+  type="text/javascript"
+></script>
+
+<script>
+window.addEventListener('load', async () => {
+  try {
+    // Initialize Clerk
+    const clerk = window.Clerk;
+    await clerk.load();
+
+    // Preserve optional api override parameter
+    const params = new URLSearchParams(window.location.search);
+    const apiParam = params.get('api');
+    const afterUrlBase = 'http://127.0.0.1:8080/frontend_static/dashboard.html';
+    const loginUrlBase = 'http://127.0.0.1:8080/frontend_static/login.html';
+    const afterSignInUrl = apiParam ? `${afterUrlBase}?api=${encodeURIComponent(apiParam)}` : afterUrlBase;
+    const signUpUrl = apiParam ? `${loginUrlBase}?api=${encodeURIComponent(apiParam)}` : loginUrlBase;
+
+    // Check if user is already signed in
+    if (clerk.user) {
+      // User is signed in, redirect to dashboard
+      window.location.href = afterSignInUrl;
+      return;
+    }
+
+    // Mount the sign-in component
+    const signInDiv = document.getElementById('clerkSignIn');
+    clerk.mountSignIn(signInDiv, {
+      appearance: {
+        elements: {
+          formButtonPrimary: {
+            backgroundColor: '#10b981',
+            '&:hover': {
+              backgroundColor: '#059669'
+            }
+          },
+          card: {
+            boxShadow: 'none'
+          }
+        }
+      },
+      afterSignInUrl,
+      signUpUrl
+    });
+
+  } catch (error) {
+    console.error('Clerk initialization error:', error);
+    const errorContainer = document.getElementById('errorContainer');
+    errorContainer.innerHTML = `
+      <div class="error-message" style="display:flex; align-items:center; gap:8px; justify-content:center;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
+        <strong>Authentication Error</strong><br>
+        Unable to load authentication. Please check your Clerk configuration.
+      </div>
+    `;
+  }
+});
+</script>
+</body>
+</html>

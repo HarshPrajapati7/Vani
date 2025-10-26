@@ -1,0 +1,14 @@
+fastapi
+uvicorn
+pandas
+numpy
+scikit-learn
+python-multipart
+pillow
+rasterio
+shapely
+python-dotenv
+python-jose[cryptography]
+passlib[bcrypt]
+reportlab
+requests

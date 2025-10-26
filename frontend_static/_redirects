@@ -1,0 +1,6 @@
+# Netlify proxy: replace BACKEND_URL with your deployed FastAPI base
+# Maps /api/* on Netlify to your backend /api/*
+# Example if backend is https://vani-backend.onrender.com
+# /api/*  https://vani-backend.onrender.com/api/:splat  200
+
+/api/*  https://BACKEND_URL/api/:splat  200
