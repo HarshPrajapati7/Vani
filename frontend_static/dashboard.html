@@ -436,8 +436,8 @@ details.card[open] .caret{transform:rotate(180deg)}
     <div class="content">
       <!-- Home/Dashboard Page -->
       <div id="home" class="page active">
-        <!-- Stats Grid at Top -->
-        <div class="stats-grid">
+        <!-- Stats Grid at Top - 2 Columns -->
+        <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap:16px;">
           <div class="stat-card">
             <div class="stat-label">Total Farms</div>
             <div class="stat-value">342</div>
@@ -470,7 +470,7 @@ details.card[open] .caret{transform:rotate(180deg)}
         </div>
 
         <!-- Main Dashboard Content Grid - Stacks on Mobile -->
-        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:20px; margin-bottom:24px;">
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; margin-bottom:24px;">
           <!-- Flood Trend Analysis -->
           <div class="card">
             <div class="card-title">Flood Trend Analysis</div>
@@ -490,8 +490,8 @@ details.card[open] .caret{transform:rotate(180deg)}
           </div>
         </div>
 
-        <!-- Recent Activity & Stats (Stacks Vertically) -->
-        <div style="display:grid; grid-template-columns:1fr; gap:20px; margin-bottom:24px;">
+        <!-- Recent Activity & Claim Status (Full Width on Mobile) -->
+        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; margin-bottom:24px;" class="activity-grid">
           <!-- Recent Activity -->
           <div class="card" style="padding:20px;">
             <div class="card-title" style="font-size:16px; margin-bottom:16px;">Recent Activity</div>
@@ -539,117 +539,12 @@ details.card[open] .caret{transform:rotate(180deg)}
         </div>
       </div>
 
-        <div style="display:grid; grid-template-columns:1fr; gap:20px;">
-          <div class="card">
-            <div class="card-title">Recent Claims</div>
-            
-            <!-- Desktop Table View -->
-            <div class="table-responsive claims-table-wrapper">
-            <table class="table">
-              <thead>
-                <tr><th>Farm ID</th><th>Status</th><th>Flood %</th><th>Action</th></tr>
-              </thead>
-              <tbody id="claimsTable">
-                <tr><td>F-2301</td><td><span class="badge badge-warning">Pending</span></td><td>42%</td><td>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2301')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    PDF
-                  </button>
-                </td></tr>
-                <tr><td>F-2298</td><td><span class="badge badge-success">Verified</span></td><td>56%</td><td>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2298')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    PDF
-                  </button>
-                </td></tr>
-                <tr><td>F-2289</td><td><span class="badge badge-danger">Rejected</span></td><td>18%</td><td>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2289')">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline-block; vertical-align:middle; margin-right:4px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    PDF
-                  </button>
-                </td></tr>
-              </tbody>
-            </table>
-            </div>
-
-            <!-- Mobile Card View -->
-            <div class="claims-mobile" style="display:none;">
-              <div class="claim-card">
-                <div class="claim-card-header">
-                  <div class="claim-card-id">F-2301</div>
-                  <span class="badge badge-warning">Pending</span>
-                </div>
-                <div class="claim-card-body">
-                  <div class="claim-card-row">
-                    <span class="claim-card-label">Flood Coverage:</span>
-                    <span>42%</span>
-                  </div>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2301')" style="width:100%; margin-top:8px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    Download PDF
-                  </button>
-                </div>
-              </div>
-
-              <div class="claim-card">
-                <div class="claim-card-header">
-                  <div class="claim-card-id">F-2298</div>
-                  <span class="badge badge-success">Verified</span>
-                </div>
-                <div class="claim-card-body">
-                  <div class="claim-card-row">
-                    <span class="claim-card-label">Flood Coverage:</span>
-                    <span>56%</span>
-                  </div>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2298')" style="width:100%; margin-top:8px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    Download PDF
-                  </button>
-                </div>
-              </div>
-
-              <div class="claim-card">
-                <div class="claim-card-header">
-                  <div class="claim-card-id">F-2289</div>
-                  <span class="badge badge-danger">Rejected</span>
-                </div>
-                <div class="claim-card-body">
-                  <div class="claim-card-row">
-                    <span class="claim-card-label">Flood Coverage:</span>
-                    <span>18%</span>
-                  </div>
-                  <button class="btn btn-sm btn-secondary" onclick="downloadPDF('C-2289')" style="width:100%; margin-top:8px;">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right:6px;">
-                      <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/>
-                    </svg>
-                    Download PDF
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       <!-- Farm Management Page -->
       <div id="farms" class="page">
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">
-            <span>Add New Farm</span>
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
-            <button class="btn btn-sm btn-primary" onclick="gpsAutoLocate()" style="margin-bottom:16px;">
+        <div class="card">
+          <div class="card-title">Add New Farm</div>
+          <div style="padding:20px;">
+            <button class="btn btn-sm btn-primary" onclick="gpsAutoLocate()" style="margin-bottom:16px; width:100%;">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:6px;">
                 <circle cx="12" cy="12" r="10"/>
                 <circle cx="12" cy="12" r="3"/>
@@ -660,20 +555,6 @@ details.card[open] .caret{transform:rotate(180deg)}
               </svg>
               GPS Auto-Locate
             </button>
-  <div style="display:grid; grid-template-columns:1.618fr 1fr; gap:24px; margin-bottom:24px; align-items:start;">
-  <div style="display:grid; grid-template-columns:1.618fr 1fr; gap:24px; align-items:start;">
-                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                  <span>Claim #C-1024 Verified</span>
-                </div>
-                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                  <span>Claim #C-1019 Submitted</span>
-                </div>
-                <div class="timeline-title" style="display:flex; align-items:center; gap:8px;">
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 12h12"/><path d="M6 8h12"/><path d="M6 16h12"/><path d="M8 20h8"/></svg>
-                  <span>Claim #C-1012 Settled</span>
-                </div>
           <form id="farmForm" onsubmit="submitFarm(event)">
             <div class="form-row">
               <div class="form-group">
@@ -718,13 +599,11 @@ details.card[open] .caret{transform:rotate(180deg)}
             <button type="submit" class="btn btn-primary">Submit Farm Details</button>
           </form>
           </div>
-        </details>
+        </div>
 
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">Registered Farms
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
+        <div class="card">
+          <div class="card-title">Registered Farms</div>
+          <div style="padding:20px;">
             <div class="table-responsive">
               <table class="table">
                 <thead>
@@ -737,17 +616,15 @@ details.card[open] .caret{transform:rotate(180deg)}
               </table>
             </div>
           </div>
-        </details>
+        </div>
       </div>
 
       <!-- Claims Tracking Page -->
       <div id="claims" class="page">
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">Claim Status Pipeline
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
-            <div class="stats-grid">
+        <div class="card">
+          <div class="card-title">Claim Status Pipeline</div>
+          <div style="padding:20px;">
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap:16px;">
               <div class="stat-card">
                 <div class="stat-label">Submitted</div>
                 <div class="stat-value" style="color:var(--info);">28</div>
@@ -766,13 +643,11 @@ details.card[open] .caret{transform:rotate(180deg)}
               </div>
             </div>
           </div>
-        </details>
+        </div>
 
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">Recent Claims Timeline
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
+        <div class="card">
+          <div class="card-title">Recent Claims Timeline</div>
+          <div style="padding:20px;">
             <div class="timeline">
               <div class="timeline-item">
                 <div class="timeline-content">
@@ -806,7 +681,7 @@ details.card[open] .caret{transform:rotate(180deg)}
               </div>
             </div>
           </div>
-        </details>
+        </div>
       </div>
 
       <!-- Weather & Advisory Page -->
@@ -841,12 +716,10 @@ details.card[open] .caret{transform:rotate(180deg)}
 
       <!-- Admin Panel Page -->
       <div id="admin" class="page">
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">System Overview
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
-            <div class="stats-grid">
+        <div class="card">
+          <div class="card-title">System Overview</div>
+          <div style="padding:20px;">
+            <div class="stats-grid" style="grid-template-columns: repeat(2, 1fr); gap:16px;">
               <div class="stat-card">
                 <div class="stat-label">Total Users</div>
                 <div class="stat-value">1,245</div>
@@ -865,13 +738,11 @@ details.card[open] .caret{transform:rotate(180deg)}
               </div>
             </div>
           </div>
-        </details>
+        </div>
 
-        <details class="card mobile-collapsible" open>
-          <summary class="card-title">All Claims (Admin View)
-            <svg class="caret" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
-          </summary>
-          <div class="collapse-body">
+        <div class="card">
+          <div class="card-title">All Claims (Admin View)</div>
+          <div style="padding:20px;">
             <div class="table-responsive">
               <table class="table">
                 <thead>
@@ -885,7 +756,7 @@ details.card[open] .caret{transform:rotate(180deg)}
               </table>
             </div>
           </div>
-        </details>
+        </div>
       </div>
 
     </div>
@@ -1385,45 +1256,36 @@ async function logout() {
   }
 }
 
-// Load weather data using OpenWeatherMap API
+// Load weather data using OpenWeatherMap API (or mock for demo)
 async function loadWeather() {
   try {
-    // Coordinates for Bhubaneswar, Odisha (example location)
-    const lat = 20.2961;
-    const lon = 85.8245;
-    const apiKey = 'YOUR_OPENWEATHER_API_KEY'; // Replace with actual API key from .env
+    // Use mock data for demo mode to avoid API key exposure
+    // In production, implement backend proxy endpoint at /api/weather/current
     
-    // Try to load current weather directly from OpenWeatherMap
-    const currentRes = await fetch(
-      `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-    );
+    // Mock weather data for Bhubaneswar, Odisha
+    const mockWeather = {
+      temp: 28,
+      description: 'Partly cloudy',
+      humidity: 75,
+      windSpeed: 12.5,
+      pressure: 1010
+    };
     
-    if (currentRes.ok) {
-      const currentData = await currentRes.json();
-      const weatherData = {
-        temp: currentData.main.temp,
-        description: currentData.weather[0].description,
-        humidity: currentData.main.humidity,
-        windSpeed: currentData.wind.speed,
-        pressure: currentData.main.pressure
-      };
-      displayCurrentWeather(weatherData);
-      updateHomeWeatherStat(weatherData);
-      
-      // Load 7-day forecast
-      const forecastRes = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?lat=${lat}&lon=${lon}&units=metric&appid=${apiKey}`
-      );
-      
-      if (forecastRes.ok) {
-        const forecastData = await forecastRes.json();
-        displayForecast(forecastData);
-      }
-    } else {
-      throw new Error('Weather API returned error');
-    }
+    displayCurrentWeather(mockWeather);
+    updateHomeWeatherStat(mockWeather);
     
-    // Show weather advisory
+    // Mock forecast data
+    const mockForecast = {
+      list: [
+        { dt: Date.now()/1000 + 86400, main: { temp: 29 }, weather: [{ main: 'Clouds' }] },
+        { dt: Date.now()/1000 + 172800, main: { temp: 27 }, weather: [{ main: 'Rain' }] },
+        { dt: Date.now()/1000 + 259200, main: { temp: 26 }, weather: [{ main: 'Rain' }] },
+        { dt: Date.now()/1000 + 345600, main: { temp: 28 }, weather: [{ main: 'Clouds' }] },
+        { dt: Date.now()/1000 + 432000, main: { temp: 29 }, weather: [{ main: 'Clear' }] }
+      ]
+    };
+    
+    displayForecast(mockForecast);
     displayAlerts([]);
     
   } catch (e) {
@@ -1488,7 +1350,7 @@ async function loadWeather() {
       alerts.innerHTML = `
         <div class="alert alert-info" style="display:flex; align-items:center; gap:8px;">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-          <strong>Advisory:</strong> Weather data is in demo mode. Configure OpenWeatherMap API key in the code.
+          <strong>Advisory:</strong> Weather data is displayed in demo mode. For production, integrate with OpenWeatherMap API via backend.
         </div>`;
     }
   }

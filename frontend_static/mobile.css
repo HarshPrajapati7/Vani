@@ -117,6 +117,10 @@
   .main {
     padding-bottom: 80px; /* Space for bottom nav */
     width: 100%;
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    overflow: hidden;
   }
 
   /* Stack all inline grid layouts on mobile */
@@ -129,9 +133,15 @@
     width: 100% !important;
   }
 
-  /* Content padding */
+  /* Content padding and scrolling */
   .content {
-    padding: 16px 12px;
+    padding: 16px 12px !important;
+    flex: 1 !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    height: auto !important;
+    max-height: none !important;
   }
 
   /* Card styling on mobile - prevent overflow */
@@ -145,6 +155,8 @@
   .page {
     width: 100%;
     overflow-x: hidden;
+    min-height: auto !important;
+    height: auto !important;
   }
 
   /* Topbar - Compact Mobile Header */
@@ -248,11 +260,85 @@
     -webkit-overflow-scrolling: touch;
   }
 
+  /* Stats Grid - Home Page 2 Columns */
+  #home .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  #home .stat-card {
+    padding: 14px !important;
+  }
+
+  #home .stat-label {
+    font-size: 12px;
+  }
+
+  #home .stat-value {
+    font-size: clamp(20px, 4vw, 28px);
+  }
+
+  /* Claim Status Pipeline - 2 column grid on mobile */
+  #claims .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+    gap: 12px !important;
+  }
+
+  #claims .stat-card {
+    padding: 16px !important;
+  }
+
+  #claims .stat-label {
+    font-size: 12px;
+  }
+
+  #claims .stat-value {
+    font-size: 28px !important;
+  }
+
+  /* Admin panel - Ensure admin controls fit */
+  #admin .stats-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Remove extra spacing before sections */
+  .card {
+    margin-bottom: 16px !important;
+  }
+
+  /* Remove extra spacing at top of pages */
+  .page {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+  }
+
+  .page .card:first-child {
+    margin-top: 0 !important;
+  }
+
   canvas {
     max-height: 220px !important;
     width: 100% !important;
     max-width: 100% !important;
+    height: auto !important;
     display: block;
+  }
+
+  /* Stack chart grids vertically on mobile */
+  #home > div[style*="grid-template-columns:repeat(2"] {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
+  }
+
+  /* Full-width charts on mobile */
+  #home .card {
+    width: 100% !important;
+  }
+
+  /* Expand Recent Activity to full width on mobile */
+  .activity-grid {
+    grid-template-columns: 1fr !important;
+    gap: 16px !important;
   }
 
   /* Map - Mobile Full Width */
@@ -656,17 +742,26 @@
 .chart-box {
   overflow: hidden;
   padding: 0;
+  position: relative;
+  width: 100%;
+  height: 300px;
 }
 
 .chart-box canvas {
   display: block !important;
   width: 100% !important;
   height: 100% !important;
+  max-width: 100%;
 }
 
 /* Stack all dashboard grids vertically on mobile */
 @media (max-width: 1024px) {
   .content > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Stack activity grid vertically */
+  .activity-grid {
     grid-template-columns: 1fr !important;
   }
 
