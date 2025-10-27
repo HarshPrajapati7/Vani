@@ -119,13 +119,17 @@
     width: 100%;
     display: flex;
     flex-direction: column;
-    height: 100vh;
+    /* Use dynamic viewport height to avoid iOS browser UI jump */
+    height: calc(var(--vh) * 100);
     overflow: hidden;
   }
 
-  /* Stack all inline grid layouts on mobile */
-  .content > div[style*="grid-template-columns"] {
-    grid-template-columns: 1fr !important;
+  /* Grid helpers (replace inline grid styles) */
+  .cards-grid { display: grid; gap: 20px; }
+  .cards-2 { grid-template-columns: repeat(2, 1fr); }
+  .cards-3 { grid-template-columns: repeat(3, 1fr); }
+  @media (max-width: 1024px) {
+    .cards-2, .cards-3 { grid-template-columns: 1fr; gap: 16px; }
   }
 
   /* Ensure map is full-width */
@@ -157,6 +161,12 @@
     overflow-x: hidden;
     min-height: auto !important;
     height: auto !important;
+  }
+
+  /* Keyboard accessibility */
+  .nav-item:focus-visible, .btn:focus-visible, button:focus-visible, a:focus-visible {
+    outline: 2px solid var(--emerald);
+    outline-offset: 2px;
   }
 
   /* Topbar - Compact Mobile Header */
@@ -324,22 +334,8 @@
     display: block;
   }
 
-  /* Stack chart grids vertically on mobile */
-  #home > div[style*="grid-template-columns:repeat(2"] {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
-
   /* Full-width charts on mobile */
-  #home .card {
-    width: 100% !important;
-  }
-
-  /* Expand Recent Activity to full width on mobile */
-  .activity-grid {
-    grid-template-columns: 1fr !important;
-    gap: 16px !important;
-  }
+  #home .card { width: 100% !important; }
 
   /* Map - Mobile Full Width */
   #map {
@@ -775,4 +771,177 @@
   .cta .btn {
     width: 100%;
   }
+}
+
+/* ========================================================================== */
+/* UTILITY CLASSES - Replace inline styles for better maintainability       */
+/* ========================================================================== */
+
+/* Grid layouts - No inline styles needed */
+.grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+.grid-2-mobile-1 {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-2-mobile-1 {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+}
+
+.grid-auto {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 20px;
+}
+
+@media (max-width: 768px) {
+  .grid-auto {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Activity and content grids */
+.cards-full-width {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  width: 100%;
+}
+
+@media (max-width: 1024px) {
+  .cards-full-width {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Flex utilities */
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Padding utilities */
+.p-20 { padding: 20px; }
+.p-16 { padding: 16px; }
+.pb-24 { padding-bottom: 24px; }
+.mb-24 { margin-bottom: 24px; }
+.mb-16 { margin-bottom: 16px; }
+
+/* ========================================================================== */
+/* ACCESSIBILITY - Keyboard navigation & reduced motion support              */
+/* ========================================================================== */
+
+/* Focus states for keyboard users */
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+[role="tab"]:focus-visible,
+.nav-item:focus-visible {
+  outline: 3px solid var(--emerald);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Respect user's motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  /* Disable continuous animations */
+  .neon-ring,
+  .neon-ring::before,
+  .neon-ring::after,
+  .neon-edge,
+  .neon-edge::before,
+  .neon-halo,
+  .neon-halo::before,
+  .neon-halo::after,
+  body::before {
+    animation: none !important;
+  }
+
+  /* Static fallback background for reduced-motion */
+  body::before {
+    background: linear-gradient(180deg, #0f5538 0%, #0a3d2c 40%, #070b12 75%, #05070b 100%) !important;
+  }
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: more) {
+  .stat-label,
+  .text-muted {
+    color: var(--text) !important;
+    opacity: 1 !important;
+  }
+
+  .card,
+  .stat-card {
+    border-width: 2px;
+  }
+}
+
+/* ========================================================================== */
+/* BUTTON & INTERACTIVE ELEMENT IMPROVEMENTS                                */
+/* ========================================================================== */
+
+/* Ensure all buttons have proper touch targets */
+button,
+a[role="button"],
+.btn,
+.nav-item {
+  min-height: 44px;
+  min-width: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Remove default focus outline (we use custom above) */
+button:focus,
+a:focus,
+[role="button"]:focus {
+  outline: none;
+}
+
+/* Disabled state contrast */
+button:disabled,
+[aria-disabled="true"] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ========================================================================== */
+/* iOS VIEWPORT FIXES - Use CSS variables for dynamic viewport height        */
+/* ========================================================================== */
+
+.viewport-full {
+  height: 100vh;
+  height: 100dvh; /* Dynamic viewport height (safer than 100vh on mobile) */
+}
+
+.viewport-safe {
+  height: calc(100vh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
+  height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
 }

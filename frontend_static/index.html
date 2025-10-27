@@ -8,6 +8,7 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#0a3d2c">
     <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
     <title>Vani — AI-Powered Flood Insurance</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -17,13 +18,12 @@
     <!-- Mobile Responsive CSS -->
     <link rel="stylesheet" href="mobile.css">
 
-    <!-- Animation Libraries -->
-    <script src="https://unpkg.com/@barba/core@2.9.7/dist/barba.umd.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
-    
+    <!-- Animation Libraries (defer to avoid blocking render) -->
+    <script src="https://unpkg.com/@barba/core@2.9.7/dist/barba.umd.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/gh/studio-freight/lenis@1.0.19/bundled/lenis.min.js" defer></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js" defer></script>
     <!-- Textbits for stunning text animations -->
-    <script src="https://unpkg.com/textbits@1.0.3/dist/textbits.min.js"></script>
+    <script src="https://unpkg.com/textbits@1.0.3/dist/textbits.min.js" defer></script>
     
     <!-- Mobile Navigation -->
     <script src="mobile-nav.js" defer></script>
@@ -121,7 +121,13 @@
                 .hero-visual{ margin:48px auto 0; width:min(calc(var(--container-max) / var(--phi)), 94vw); aspect-ratio: 16/9; position:relative; overflow: visible; }
                 .hero-visual::before{ content:''; position:absolute; inset:-28px -32px 24px; border-radius:24px; background:linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.02)); filter:blur(0.3px); border:1px solid rgba(255,255,255,0.06); z-index:1; }
                 
-                /* Glow layer 1 - Large rotating gradient */
+                        /* Respect reduced motion */
+                        @media (prefers-reduced-motion: reduce) {
+                            .neon-ring, .neon-ring::before, .neon-ring::after, .neon-edge, .neon-halo,
+                            .neon-halo::before, .neon-halo::after { animation: none !important; }
+                        }
+
+                        /* Glow layer 1 - Large rotating gradient */
                 .neon-ring{ position:absolute; inset:-4%; border-radius:28px; z-index:-1; pointer-events:none;
                     background: conic-gradient(from 0deg at 50% 50%, 
                         rgba(99,102,241,0.6) 0deg,
@@ -318,6 +324,13 @@
     </style>
 </head>
 <body data-barba="wrapper">
+        <script>
+            if ('serviceWorker' in navigator) {
+                window.addEventListener('load', function() {
+                    navigator.serviceWorker.register('/sw.js').catch(console.error);
+                });
+            }
+        </script>
     <div data-barba="container" data-barba-namespace="home">
     <header class="container nav">
         <div class="brand">
@@ -403,5 +416,20 @@
                 </div>
             </div>
         </section>
+
+<!-- Service Worker Registration -->
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('/frontend_static/sw.js', { scope: '/' })
+        .then((reg) => {
+          console.log('✅ Service Worker registered:', reg.scope);
+        })
+        .catch((err) => {
+          console.warn('⚠️ Service Worker registration failed:', err);
+        });
+    });
+  }
+</script>
 </body>
 </html>

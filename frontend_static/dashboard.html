@@ -8,6 +8,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#ffffff">
 <link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" sizes="180x180" href="/icons/apple-touch-icon.png">
 <title>Vani - Dashboard</title>
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
@@ -41,7 +42,7 @@
 body{font-family:var(--font-body); 
      background:var(--bg); color:var(--text); letter-spacing:-0.01em;
      position:relative; overflow-x:hidden; overflow-y:auto;}
-.dashboard{display:flex; min-height:100vh; position:relative; z-index:1;}
+.dashboard{display:flex; min-height:calc(var(--vh) * 100); position:relative; z-index:1;}
 
 /* Sidebar */
 .sidebar{
@@ -64,6 +65,7 @@ body{font-family:var(--font-body);
   transition:all .25s cubic-bezier(0.4, 0, 0.2, 1); border-left:3px solid transparent; 
   position:relative; font-weight:500; font-size:15px; margin:4px 12px; border-radius:8px;
   font-family:var(--font-body); color:var(--text-muted);
+  background:none; border:none; text-align:left; width:calc(100% - 24px);
 }
 .nav-item::before{
   content:''; position:absolute; left:0; top:0; bottom:0; right:0;
@@ -97,8 +99,8 @@ body{font-family:var(--font-body);
 .menu-btn svg{display:block}
 .topbar-left{display:flex; align-items:center; gap:16px;}
 .page-title{
-  font-size:24px; font-weight:700; color:var(--dark-forest); letter-spacing:-0.5px;
-  font-family:var(--font-heading);
+  font-size:clamp(16px, 5vw, 24px); font-weight:700; color:var(--dark-forest); letter-spacing:-0.5px;
+  font-family:var(--font-heading); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
 }
 .topbar-right{display:flex; align-items:center; gap:16px;}
 .badge{padding:6px 14px; border-radius:8px; font-size:13px; font-weight:600; letter-spacing:-0.01em; font-family:var(--font-body);}
@@ -148,8 +150,8 @@ body{font-family:var(--font-body);
   background:radial-gradient(circle, rgba(16, 185, 129, 0.05) 0%, transparent 70%);
   pointer-events:none;
 }
-.card-title{font-size:20px; font-weight:700; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;
-            color:var(--dark-forest); letter-spacing:-0.5px; font-family:var(--font-heading);}
+.card-title{font-size:clamp(16px, 4vw, 20px); font-weight:700; margin-bottom:20px; display:flex; align-items:center; justify-content:space-between;
+            color:var(--dark-forest); letter-spacing:-0.5px; font-family:var(--font-heading); flex-wrap:wrap; gap:12px;}
 
 /* Charts: fixed-height containers to prevent oversized canvases */
 .chart-box{ position:relative; height:280px; width:100%; }
@@ -315,7 +317,10 @@ body{font-family:var(--font-body);
 
 /* Current Weather grid responsive */
 .current-weather-grid{display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;}
-@media (max-width: 1024px){ .current-weather-grid{grid-template-columns:repeat(2, 1fr);} }
+@media (max-width: 1024px){
+  .current-weather-grid{grid-template-columns:repeat(2, 1fr);} 
+  .page-title{font-size:clamp(14px, 4vw, 18px) !important; white-space:nowrap; overflow:hidden; text-overflow:ellipsis;}
+}
 @media (max-width: 640px){ .current-weather-grid{grid-template-columns:1fr;} }
 
 /* Risk Alert */
@@ -348,25 +353,50 @@ details.card[open] .caret{transform:rotate(180deg)}
 }
 @media (max-width: 640px){
   .stats-grid{grid-template-columns:1fr}
-  .topbar{padding:0 16px; height:64px}
-  .page-title{font-size:20px}
-  .content{padding:16px; padding-bottom:88px}
-  .card{padding:16px}
+  .topbar{padding:0 12px; height:60px; gap:8px;}
+  .topbar-left{gap:10px;}
+  .topbar-right{gap:6px; font-size:12px;}
+  .page-title{font-size:clamp(14px, 3.5vw, 16px); font-weight:600;}
+  .menu-btn{padding:6px;}
+  .badge{padding:4px 10px; font-size:11px;}
+  .btn.btn-sm{padding:6px 10px; font-size:12px;}
+  .content{padding:12px; padding-bottom:88px}
+  .card{padding:14px}
+  .card-title{font-size:clamp(14px, 3.5vw, 16px); margin-bottom:12px;}
   #map{height:300px}
   .chart-box{height:180px}
   .chart-box.small{height:140px}
 }
 
+/* Extra small screens (< 480px) */
+@media (max-width: 480px){
+  .topbar{padding:0 10px; height:56px;}
+  .page-title{font-size:14px; font-weight:600;}
+  .card-title{font-size:14px; margin-bottom:10px;}
+  .content{padding:10px; padding-bottom:88px}
+  .card{padding:12px}
+  .badge{padding:3px 8px; font-size:10px;}
+  .stat-label{font-size:11px;}
+  .stat-value{font-size:clamp(18px, 5vw, 24px);}
+}
+
 /* Bottom navigation (mobile) */
 .bottom-nav{position:fixed; left:0; right:0; bottom:0; height:64px; background:var(--card); border-top:1px solid var(--border); box-shadow:0 -2px 8px rgba(10, 61, 44, 0.06); display:none; z-index:1500;}
 .bottom-nav .bn-wrap{display:flex; height:100%;}
-.bn-item{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; gap:6px; cursor:pointer;}
+.bn-item{flex:1; display:flex; flex-direction:column; align-items:center; justify-content:center; color:var(--text-muted); font-size:11px; gap:6px; cursor:pointer; transition:color 0.2s ease;}
 .bn-item svg{width:20px; height:20px;}
 .bn-item.active{color:var(--emerald); font-weight:600;}
-@media (max-width: 640px){ .bottom-nav{display:block} }
+@media (max-width: 1024px){ .bottom-nav{display:block !important} }
 </style>
 </head>
 <body style="overflow-x:hidden;">
+<script>
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', function() {
+      navigator.serviceWorker.register('/sw.js').catch(console.error);
+    });
+  }
+</script>
 <div class="dashboard">
   <!-- Sidebar / Bottom Navigation -->
   <div class="sidebar">
@@ -377,37 +407,37 @@ details.card[open] .caret{transform:rotate(180deg)}
       </svg>
       Vani
     </div>
-    <div class="nav">
-  <div class="nav-item active" onclick="showPage('home', this)">
+    <div class="nav" role="navigation" aria-label="Primary">
+      <button class="nav-item active" type="button" onclick="showPage('home', this)" aria-current="page">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/>
         </svg>
         <span>Dashboard</span>
-      </div>
-  <div class="nav-item" onclick="showPage('farms', this)">
+      </button>
+      <button class="nav-item" type="button" onclick="showPage('farms', this)">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
         </svg>
         <span>Farm Management</span>
-      </div>
-  <div class="nav-item" onclick="showPage('claims', this)">
+      </button>
+      <button class="nav-item" type="button" onclick="showPage('claims', this)">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/>
         </svg>
         <span>Claims Tracking</span>
-      </div>
-  <div class="nav-item" onclick="showPage('weather', this)">
+      </button>
+      <button class="nav-item" type="button" onclick="showPage('weather', this)">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>
         </svg>
         <span>Weather & Advisory</span>
-      </div>
-  <div class="nav-item" onclick="showPage('admin', this)">
+      </button>
+      <button class="nav-item" type="button" onclick="showPage('admin', this)">
         <svg class="nav-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <circle cx="12" cy="12" r="3"/><path d="M12 1v6m0 6v6m8.66-15.66l-4.24 4.24m-4.24 4.24l-4.24 4.24m15.66-4.24l-4.24-4.24m-4.24-4.24l-4.24-4.24"/>
         </svg>
         <span>Admin Panel</span>
-      </div>
+      </button>
     </div>
     <div class="user-info" style="cursor: pointer;" onclick="logout()" title="Click to sign out">
       <div class="avatar">U</div>
@@ -469,8 +499,8 @@ details.card[open] .caret{transform:rotate(180deg)}
           <div id="map" style="height:520px; width:100%;"></div>
         </div>
 
-        <!-- Main Dashboard Content Grid - Stacks on Mobile -->
-        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; margin-bottom:24px;">
+  <!-- Main Dashboard Content Grid - Stacks on Mobile -->
+  <div class="cards-grid cards-2" style="margin-bottom:24px;">
           <!-- Flood Trend Analysis -->
           <div class="card">
             <div class="card-title">Flood Trend Analysis</div>
@@ -490,8 +520,8 @@ details.card[open] .caret{transform:rotate(180deg)}
           </div>
         </div>
 
-        <!-- Recent Activity & Claim Status (Full Width on Mobile) -->
-        <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:20px; margin-bottom:24px;" class="activity-grid">
+  <!-- Recent Activity & Claim Status (Full Width on Mobile) -->
+  <div class="cards-grid cards-2 activity-grid" style="margin-bottom:24px;">
           <!-- Recent Activity -->
           <div class="card" style="padding:20px;">
             <div class="card-title" style="font-size:16px; margin-bottom:16px;">Recent Activity</div>
@@ -1531,6 +1561,19 @@ async function downloadPDF(claimId) {
     console.error('PDF download error:', e);
   alert('Failed to download PDF');
   }
+}
+
+// Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/frontend_static/sw.js', { scope: '/' })
+      .then((reg) => {
+        console.log('✅ Service Worker registered:', reg.scope);
+      })
+      .catch((err) => {
+        console.warn('⚠️ Service Worker registration failed:', err);
+      });
+  });
 }
 
 </script>
