@@ -25,71 +25,82 @@
     flex-direction: column;
   }
 
-  /* Sidebar - Mobile Bottom Navigation */
+  /* Sidebar - Mobile Bottom Navigation (prevent horizontal layout issues) */
   .sidebar {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    width: 100%;
-    height: auto;
-    flex-direction: row;
-    z-index: 1000;
-    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1);
-    padding: 0;
-    border-right: none;
-    border-top: 1px solid var(--border);
-    background: rgba(255, 255, 255, 0.98);
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    top: auto !important;
+    width: 100% !important;
+    height: auto !important;
+    max-height: 80px !important;
+    flex-direction: row !important;
+    z-index: 1000 !important;
+    box-shadow: 0 -2px 16px rgba(0, 0, 0, 0.1) !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-right: none !important;
+    border-top: 1px solid var(--border) !important;
+    background: rgba(255, 255, 255, 0.98) !important;
     backdrop-filter: blur(20px);
-    padding-bottom: var(--safe-area-bottom);
+    padding-bottom: var(--safe-area-bottom) !important;
+    display: flex !important;
+    overflow: hidden !important;
   }
 
   .sidebar::before {
-    display: none;
+    display: none !important;
   }
 
   /* Hide logo in bottom nav */
   .sidebar .logo {
-    display: none;
+    display: none !important;
   }
 
   /* Mobile Bottom Navigation Items */
   .nav {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
-    align-items: center;
-    width: 100%;
-    padding: 8px 4px 4px;
+    display: flex !important;
+    flex-direction: row !important;
+    justify-content: space-around !important;
+    align-items: center !important;
+    width: 100% !important;
+    padding: 8px 4px 4px !important;
+    margin: 0 !important;
+    gap: 0 !important;
   }
 
   .nav-item {
-    flex-direction: column;
-    gap: 4px;
-    padding: 8px 12px;
-    margin: 0;
-    border-left: none;
-    border-radius: 12px;
-    min-width: 64px;
-    text-align: center;
-    font-size: 11px;
-    flex: 1;
-    max-width: 80px;
+    flex-direction: column !important;
+    gap: 4px !important;
+    padding: 8px 12px !important;
+    margin: 0 !important;
+    border-left: none !important;
+    border-radius: 12px !important;
+    min-width: 64px !important;
+    max-width: 80px !important;
+    text-align: center !important;
+    font-size: 11px !important;
+    flex: 1 !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    white-space: nowrap !important;
   }
 
   .nav-item::before {
-    display: none;
+    display: none !important;
   }
 
   .nav-item:hover {
-    transform: none;
-    background: rgba(16, 185, 129, 0.08);
+    transform: none !important;
+    background: rgba(16, 185, 129, 0.08) !important;
   }
 
   .nav-item.active {
-    background: rgba(16, 185, 129, 0.15);
-    box-shadow: none;
-    transform: scale(1.05);
+    background: rgba(16, 185, 129, 0.15) !important;
+    box-shadow: none !important;
+    transform: scale(1.05) !important;
   }
 
   .nav-icon {
@@ -108,17 +119,78 @@
     width: 100%;
   }
 
+  /* Stack all inline grid layouts on mobile */
+  .content > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Ensure map is full-width */
+  #map {
+    width: 100% !important;
+  }
+
+  /* Content padding */
+  .content {
+    padding: 16px 12px;
+  }
+
+  /* Card styling on mobile - prevent overflow */
+  .card {
+    width: 100% !important;
+    overflow: hidden;
+    padding: 16px !important;
+  }
+
+  /* Ensure all containers don't overflow */
+  .page {
+    width: 100%;
+    overflow-x: hidden;
+  }
+
   /* Topbar - Compact Mobile Header */
   .topbar {
     height: auto;
     padding: 12px 16px;
     padding-top: calc(12px + var(--safe-area-top));
-    flex-wrap: wrap;
-    gap: 12px;
+    flex-wrap: nowrap;
+    gap: 8px;
+    justify-content: space-between;
+    align-items: center;
   }
 
-  .menu-btn {
-    display: inline-flex;
+  .topbar-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+    min-width: 0;
+  }
+
+  .topbar-right {
+    display: flex !important;
+    gap: 6px !important;
+    align-items: center !important;
+    flex-shrink: 0;
+  }
+
+  .page-title {
+    font-size: 18px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .badge {
+    font-size: 12px;
+    padding: 4px 10px;
+    white-space: nowrap;
+  }
+
+  .btn.btn-sm {
+    padding: 8px 12px;
+    font-size: 13px;
+    white-space: nowrap;
+  }
     align-items: center;
     justify-content: center;
     min-width: var(--touch-target);
@@ -159,6 +231,8 @@
     padding: 16px;
     border-radius: 16px;
     margin-bottom: 16px;
+    width: 100% !important;
+    overflow: hidden;
   }
 
   .chart-container h3 {
@@ -166,8 +240,19 @@
     margin-bottom: 12px;
   }
 
+  .chart-box {
+    position: relative;
+    width: 100% !important;
+    height: auto !important;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
   canvas {
     max-height: 220px !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    display: block;
   }
 
   /* Map - Mobile Full Width */
@@ -564,5 +649,35 @@
   button, a, input, select, textarea {
     min-height: var(--touch-target);
     min-width: var(--touch-target);
+  }
+}
+
+/* Charts - Compact for Mobile (Canvas-style) */
+.chart-box {
+  overflow: hidden;
+  padding: 0;
+}
+
+.chart-box canvas {
+  display: block !important;
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Stack all dashboard grids vertically on mobile */
+@media (max-width: 1024px) {
+  .content > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Keep card spacing tight */
+  .card {
+    padding: 16px !important;
+    margin-bottom: 12px;
+  }
+
+  /* CTA buttons full width on small screens */
+  .cta .btn {
+    width: 100%;
   }
 }

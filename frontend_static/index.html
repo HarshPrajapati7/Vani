@@ -78,6 +78,7 @@
                     font-weight: 800;
                     letter-spacing: -0.03em;
                     font-size:56px; line-height:1.12; margin:20px auto 14px; 
+                    padding: 0 16px;
                     max-width:calc(var(--container-max) / var(--phi));
                     background: linear-gradient(180deg, #ffffff 0%, #e8e8e8 50%, #b8b8b8 100%);
                     -webkit-background-clip: text;
@@ -87,6 +88,7 @@
                 }
                 .hero p{ 
                     color:var(--text-muted); font-size:18px; line-height:1.55; 
+                    padding: 0 16px;
                     max-width:calc(var(--container-max) / var(--phi)); margin:0 auto 28px;
                     background: linear-gradient(135deg, #d1d5db 0%, #9ca3af 100%);
                     -webkit-background-clip: text;
@@ -95,13 +97,14 @@
                     position:relative; z-index:5;
                 }
                 @media (max-width: 720px){
-                    .hero{ padding:48px 0 40px }
-                    .hero h1{ font-size:36px; line-height:1.18; max-width:94vw; margin:16px auto 12px }
-                    .hero p{ font-size:16px; line-height:1.5; max-width:94vw; margin:0 auto 20px }
+                    .hero{ padding:48px 16px 40px }
+                    .hero h1{ font-size:36px; line-height:1.18; max-width:100%; margin:16px 16px 12px; padding:0 8px; }
+                    .hero p{ font-size:16px; line-height:1.5; max-width:100%; margin:0 16px 20px; padding:0 8px; }
                 }
                 @media (max-width: 500px){
-                    .hero h1{ font-size:30px; line-height:1.2 }
-                    .hero p{ font-size:15px }
+                    .hero{ padding:40px 12px 32px; }
+                    .hero h1{ font-size:28px; line-height:1.2; margin:12px 12px 8px; padding:0 4px; }
+                    .hero p{ font-size:14px; margin:0 12px 16px; padding:0 4px; }
                 }
 
         .cta{ display:flex; gap:12px; justify-content:center; margin-top:16px; flex-wrap:wrap; position:relative; z-index:10; }
@@ -330,9 +333,9 @@
             </nav>
     </header>
 
-    <main class="container hero">
-            <h1>AI flood intelligence for crops<br/>and lightning‑fast insurance claims</h1>
-            <p>Monitor farms in real time, detect floods from satellite imagery, and automate claim assessment with accurate, explainable insights.</p>
+    <main class="container hero" style="padding: 0 16px;">
+            <h1 style="margin-left:0; margin-right:0;">AI flood intelligence for crops<br/>and lightning‑fast insurance claims</h1>
+            <p style="margin-left:0; margin-right:0;">Monitor farms in real time, detect floods from satellite imagery, and automate claim assessment with accurate, explainable insights.</p>
         <div class="cta">
                 <a class="btn btn-primary" href="/login.html">Sign in</a>
                 <a class="btn btn-ghost" href="#features">See features</a>
