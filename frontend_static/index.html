@@ -2,12 +2,20 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a3d2c">
+    <link rel="manifest" href="manifest.json">
     <title>Vani — AI-Powered Flood Insurance</title>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@700;800;900&family=Playfair+Display:wght@400;700&family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+
+    <!-- Mobile Responsive CSS -->
+    <link rel="stylesheet" href="mobile.css">
 
     <!-- Animation Libraries -->
     <script src="https://unpkg.com/@barba/core@2.9.7/dist/barba.umd.js"></script>
@@ -16,6 +24,9 @@
     
     <!-- Textbits for stunning text animations -->
     <script src="https://unpkg.com/textbits@1.0.3/dist/textbits.min.js"></script>
+    
+    <!-- Mobile Navigation -->
+    <script src="mobile-nav.js" defer></script>
 
     <style>
         :root{
@@ -307,12 +318,6 @@
     <div data-barba="container" data-barba-namespace="home">
     <header class="container nav">
         <div class="brand">
-            <div class="logo">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                    <path d="M3 12c3.5-2.5 7.5-2.5 11 0s7.5 2.5 11 0" stroke="#10b981" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                    <path d="M3 16c3.5-2.5 7.5-2.5 11 0s7.5 2.5 11 0" stroke="#34d399" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                </svg>
-            </div>
             Vani
         </div>
                         <button class="nav-toggle" onclick="document.querySelector('.nav-links').classList.toggle('open')" aria-label="Open menu">
